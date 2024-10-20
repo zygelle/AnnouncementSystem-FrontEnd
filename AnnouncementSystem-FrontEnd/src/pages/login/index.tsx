@@ -1,18 +1,33 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { Input } from '../../components/Input'
-import { FormEvent, useState } from "react";
+import { useState } from "react";
+
+import api from "../../services/api";
 
 export function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
 
-    function handleSubmit(e: FormEvent) {
+    const navigate = useNavigate();
+
+    async function login(e) {
         e.preventDefault();
 
-        console.log({
-            email: email,
-            password: password
-        })
+        const data = {
+            email,
+            password,
+        }
+
+        try {
+            const response = await api.post('authentication/login', data);
+
+            localStorage.setItem('email', email);
+            localStorage.setItem('accessToken', response.data.token);
+
+            navigate('/home');
+        } catch (error) {
+            alert('Falha no login, tente novamente!');
+        }
     }
 
     return(
@@ -23,7 +38,7 @@ export function Login() {
                 </h1>
             </Link>
 
-            <form onSubmit={handleSubmit} className="w-full max-w-xl flex flex-col p-8 rounded-lg bg-white shadow-2xl">
+            <form onSubmit={login} className="w-full max-w-xl flex flex-col p-8 rounded-lg bg-white shadow-2xl">
                 <label className="mb-2">Email</label>
                 <Input
                 placeholder="Insira seu email"
