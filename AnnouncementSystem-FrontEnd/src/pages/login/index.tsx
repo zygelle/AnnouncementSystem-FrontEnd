@@ -7,6 +7,7 @@ import api from "../../services/api";
 export function Login() {
     const [email, setEmail] = useState('');
     const [password, setPassword] = useState('');
+    const [errorMessage, setErrorMessage] = useState('');
 
     const navigate = useNavigate();
 
@@ -26,7 +27,7 @@ export function Login() {
 
             navigate('/home');
         } catch (error) {
-            alert('Falha no login, tente novamente!');
+            setErrorMessage('Falha no login, tente novamente');
         }
     }
 
@@ -54,6 +55,7 @@ export function Login() {
                 value={password}
                 onChange={ (e) => setPassword(e.target.value) }
                 />
+                {errorMessage && (<span className="text-red-600 mb-4">{errorMessage}</span>)}
 
                 <button 
                 type="submit"
