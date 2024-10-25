@@ -1,5 +1,5 @@
 import { Link, useNavigate } from "react-router-dom";
-import { Input } from '../../components/Input'
+import { Input } from '../../components/forms/Input';
 import { useState } from "react";
 
 import api from "../../services/api";
