@@ -11,7 +11,7 @@ export function Login() {
 
     const navigate = useNavigate();
 
-    async function login(e) {
+    async function login(e: React.FormEvent) {
         e.preventDefault();
 
         const data = {
