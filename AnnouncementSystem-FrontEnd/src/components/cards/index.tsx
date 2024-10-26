@@ -13,10 +13,10 @@ const OptionCard: React.FC<OptionCardProps> = ({ title, description, buttonText,
       <img loading="lazy" src="https://cdn.builder.io/api/v1/image/assets/TEMP/9aa627ecd38eaebe6f53832aa6aabcab9f9185dafaabc75d40d1baf8707973de?placeholderIfAbsent=true&apiKey=373b523e13e642948ff7f7e522970fd3" alt="" className="object-contain shrink-0 w-40 aspect-square min-h-[160px] min-w-[160px]" />
       <div className="flex flex-col flex-1 shrink basis-0 min-w-[160px] max-md:max-w-full">
         <div className="flex flex-col w-full max-md:max-w-full">
-          <h2 className="tracking-tight leading-tight font-[number:var(--sds-typography-heading-font-weight)] text-[color:var(--sds-color-text-default-default)] text-[length:var(--sds-typography-heading-size-base)] max-md:max-w-full">
+          <h2 className="tracking-tight leading-tight text-xl font-semibold max-md:max-w-full">
             {title}
           </h2>
-          <p className="mt-2 leading-snug font-[number:var(--sds-typography-body-font-weight-regular)] text-[color:var(--sds-color-text-default-secondary)] text-[length:var(--sds-typography-body-size-medium)] max-md:max-w-full">
+          <p className="mt-2 leading-snug text-gray-600 text-[length:var(--sds-typography-body-size-medium)] max-md:max-w-full">
             {description}
           </p>
         </div>

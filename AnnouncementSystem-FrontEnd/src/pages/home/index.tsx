@@ -40,10 +40,10 @@ export function Home() {
 
             <main className="w-full max-w-3xl flex flex-col p-8 rounded-lg bg-white shadow-2x mb-20 ">
                 <section className="flex flex-col max-w-full leading-tight w-[287px]">
-                    <h1 className="tracking-tight font-[number:var(--sds-typography-heading-font-weight)] text-[color:var(--sds-color-text-default-default)] text-[length:var(--sds-typography-heading-size-base)]">
+                    <h1 className="text-xl font-medium">
                         Bem-vindo ao Balcão UFF
                     </h1>
-                    <p className="mt-2 font-[number:var(--sds-typography-subheading-font-weight)] text-[color:var(--sds-color-text-default-secondary)] text-[length:var(--sds-typography-subheading-size-medium)]">
+                    <p className="mt-2 text-gray-600">
                         Escolha uma opção bla bla bla
                     </p>
                 </section>
