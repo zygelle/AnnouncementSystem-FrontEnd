@@ -3,13 +3,28 @@ import { useState } from "react";
 import {Input} from '../../../components/forms/Input'
 import { Textarea } from '../../../components/forms/Textarea';
 import CreatableSelect from 'react-select/creatable';
+import Carousel from "react-multi-carousel";
+import "react-multi-carousel/lib/styles.css";
 
 
-const formatGroupLabel = (data: any) => (
-    <div>
-      <span>{data.label}</span>
-    </div>
-  );
+
+const responsive = {
+    desktop: {
+      breakpoint: { max: 3000, min: 1024 },
+      items: 1,
+      slidesToSlide: 1 // optional, default to 1.
+    },
+    tablet: {
+      breakpoint: { max: 1024, min: 464 },
+      items: 1,
+      slidesToSlide: 1 // optional, default to 1.
+    },
+    mobile: {
+      breakpoint: { max: 464, min: 0 },
+      items: 1,
+      slidesToSlide: 1 // optional, default to 1.
+    }
+  };
 
   const dogOptions = [
     { value: 'Chihuahua' , label: 'Chihuahua'},
@@ -49,6 +64,45 @@ export function CriarAnuncio(){
             <main className="w-full max-w-3xl flex flex-col p-8 rounded-lg bg-white shadow-2x mb-20 ">
                 <div className="gap-2.5 mt-5 max-w-full ">
                     <form onSubmit={criar} className='grid grid-cols-6 gap-4' >
+                    
+                    <Carousel className='col-span-2 col-start-3 col-end-5 row-span-4' responsive={responsive}>
+                        <div>
+                            <img 
+                            loading="lazy"
+                            src="https://cdn.builder.io/api/v1/image/assets/373b523e13e642948ff7f7e522970fd3/9834cd509f3acada339e69a8ce9444326495eb23a777014a17998b8de011849f?apiKey=373b523e13e642948ff7f7e522970fd3&"
+                            
+                            className="object-contain w-52 aspect-[0.84] min-h-[247px]"
+                            />
+                        </div>
+                        <div>
+                            <img
+                            loading="lazy"
+                            src="https://cdn.builder.io/api/v1/image/assets/373b523e13e642948ff7f7e522970fd3/9834cd509f3acada339e69a8ce9444326495eb23a777014a17998b8de011849f?apiKey=373b523e13e642948ff7f7e522970fd3&"
+                            
+                            className="object-contain w-52 aspect-[0.84] min-h-[247px]"
+                            />
+                        </div>
+                       <div>
+                            <img
+                            loading="lazy"
+                            src="https://cdn.builder.io/api/v1/image/assets/373b523e13e642948ff7f7e522970fd3/9834cd509f3acada339e69a8ce9444326495eb23a777014a17998b8de011849f?apiKey=373b523e13e642948ff7f7e522970fd3&"
+                            
+                            className="object-contain w-52 aspect-[0.84] min-h-[247px]"
+                            />
+                        </div>
+                    </Carousel>
+                        
+                    <div className='col-start-3 col-span-1'>
+                        <Input name='radio' aria-label='busca' value="Busca" type='radio' ></Input>
+                        <label for="busca" class='mt-2 align-top accent-black-100'>Busca</label>
+                        
+                    </div>
+
+                    <div className='col-start-4 col-span-1'>
+                        <Input name='radio' id="busca" aria-label='oferta' value="Oferta" type='radio'></Input>
+                        <label for="oferta"className='align-top'>Oferta</label>
+                    </div>
+
                     <div className='col-span-3'>
                         <label className="mb-2">Descricao do Anuncio</label>
                         <Textarea rows="4"></Textarea>
