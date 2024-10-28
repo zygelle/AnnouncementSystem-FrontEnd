@@ -93,14 +93,14 @@ export function CriarAnuncio(){
                     </Carousel>
                         
                     <div className='col-start-3 col-span-1'>
-                        <Input name='radio' aria-label='busca' value="Busca" type='radio' ></Input>
-                        <label for="busca" class='mt-2 align-top accent-black-100'>Busca</label>
+                        <Input name='radio' aria-label='busca' value="Busca" type='radio' className='border border-slate-300 rounded-md outline-none px-2 mb-4 '></Input>
+                        <label for="busca" className=' ml-2 align-top accent-black-100'>Busca</label>
                         
                     </div>
 
                     <div className='col-start-4 col-span-1'>
-                        <Input name='radio' id="busca" aria-label='oferta' value="Oferta" type='radio'></Input>
-                        <label for="oferta"className='align-top'>Oferta</label>
+                        <Input name='radio' id="busca" aria-label='oferta' value="Oferta" type='radio' className='border border-slate-300 rounded-md outline-none px-2 mb-4 '></Input>
+                        <label for="oferta"className='ml-2 align-top'>Oferta</label>
                     </div>
 
                     <div className='col-span-3'>
