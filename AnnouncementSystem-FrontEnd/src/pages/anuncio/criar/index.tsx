@@ -1,4 +1,4 @@
-import  Header  from '../../../components/header';
+import  Header  from '../../../components/navbar/Navbar.tsx';
 import { useState } from "react";
 import {Input} from '../../../components/forms/Input'
 import { Textarea } from '../../../components/forms/Textarea';
@@ -58,19 +58,18 @@ export function CriarAnuncio(){
         
      }
     return(
-        
-        <div className="flex flex-col bg-slate-100 items-center justify-center">
-            <Header></Header>
-            <main className="w-full max-w-3xl flex flex-col p-8 rounded-lg bg-white shadow-2x mb-20 ">
+
+        <div className="main-layout">
+            <main className="main-content">
                 <div className="gap-2.5 mt-5 max-w-full ">
                     <form onSubmit={criar} className='grid grid-cols-6 gap-4' >
-                    
+
                     <Carousel className='col-span-2 col-start-3 col-end-5 row-span-4' responsive={responsive}>
                         <div>
-                            <img 
+                            <img
                             loading="lazy"
                             src="https://cdn.builder.io/api/v1/image/assets/373b523e13e642948ff7f7e522970fd3/9834cd509f3acada339e69a8ce9444326495eb23a777014a17998b8de011849f?apiKey=373b523e13e642948ff7f7e522970fd3&"
-                            
+
                             className="object-contain w-52 aspect-[0.84] min-h-[247px]"
                             />
                         </div>
@@ -78,7 +77,7 @@ export function CriarAnuncio(){
                             <img
                             loading="lazy"
                             src="https://cdn.builder.io/api/v1/image/assets/373b523e13e642948ff7f7e522970fd3/9834cd509f3acada339e69a8ce9444326495eb23a777014a17998b8de011849f?apiKey=373b523e13e642948ff7f7e522970fd3&"
-                            
+
                             className="object-contain w-52 aspect-[0.84] min-h-[247px]"
                             />
                         </div>
@@ -86,16 +85,16 @@ export function CriarAnuncio(){
                             <img
                             loading="lazy"
                             src="https://cdn.builder.io/api/v1/image/assets/373b523e13e642948ff7f7e522970fd3/9834cd509f3acada339e69a8ce9444326495eb23a777014a17998b8de011849f?apiKey=373b523e13e642948ff7f7e522970fd3&"
-                            
+
                             className="object-contain w-52 aspect-[0.84] min-h-[247px]"
                             />
                         </div>
                     </Carousel>
-                        
+
                     <div className='col-start-3 col-span-1'>
                         <Input name='radio' aria-label='busca' value="Busca" type='radio' className='border border-slate-300 rounded-md outline-none px-2 mb-4 '></Input>
                         <label for="busca" className=' ml-2 align-top accent-black-100'>Busca</label>
-                        
+
                     </div>
 
                     <div className='col-start-4 col-span-1'>
@@ -106,7 +105,7 @@ export function CriarAnuncio(){
                     <div className='col-span-3'>
                         <label className="mb-2">Descricao do Anuncio</label>
                         <Textarea rows="4"></Textarea>
-                        
+
 
                     </div>
                     <div className='col-span-3'>
@@ -114,8 +113,8 @@ export function CriarAnuncio(){
                         <CreatableSelect isClearable isMulti className='mb-2 w-full' options={dogOptions} placeholder="Cidade"/>
                         <label className='mb-2'>Categorias</label>
                         <CreatableSelect isClearable isMulti className='mb-2' options={catOptions} placeholder="Categorias"/>
-                        
-                        
+
+
                     </div>
                     <div className='col-span-3'>
 
@@ -141,7 +140,7 @@ export function CriarAnuncio(){
                                     onChange={ (e) => setEmail(e.target.value) }
                             />
                     </div>
-                    
+
                     <button
                         type="reset"
                         className="col-start-3 h-9 hover:bg-slate-200 rounded border-slate-200 border-2 text-lg">

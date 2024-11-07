@@ -49,6 +49,14 @@
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\guari\Documents\Projetos\Engenharia de Software\AnnouncementSystem-FrontEnd\AnnouncementSystem-FrontEnd\src\pages\perfil" />
+      <recent name="C:\Users\guari\Documents\Projetos\Engenharia de Software\AnnouncementSystem-FrontEnd\AnnouncementSystem-FrontEnd\src\pages\communication" />
+      <recent name="C:\Users\guari\Documents\Projetos\Engenharia de Software\AnnouncementSystem-FrontEnd\AnnouncementSystem-FrontEnd\src\services" />
+      <recent name="C:\Users\guari\Documents\Projetos\Engenharia de Software\AnnouncementSystem-FrontEnd\AnnouncementSystem-FrontEnd\src\routers" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="dev" type="js.build_tools.npm" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/AnnouncementSystem-FrontEnd/package.json" />

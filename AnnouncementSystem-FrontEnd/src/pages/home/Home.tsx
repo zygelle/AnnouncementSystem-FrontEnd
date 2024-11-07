@@ -33,9 +33,9 @@ const options = [
 
 export function Home() {
     return(
-        <div className="flex flex-col bg-slate-100 items-center justify-center">
+        <div className="main-layout">
 
-            <main className="w-full max-w-3xl flex flex-col p-8 rounded-lg bg-white shadow-2x mb-20 ">
+            <main className="main-content">
                 <section className="flex flex-col max-w-full leading-tight w-[287px]">
                     <h1 className="text-xl font-medium">
                         Bem-vindo ao Balcão UFF
