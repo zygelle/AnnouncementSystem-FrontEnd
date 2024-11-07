@@ -1,4 +1,4 @@
-import OptionCard from '../../components/cards';
+import OptionCard from '../../components/cards/Cards.tsx';
 import {pathCommunication, pathCreateAds, pathFilterAd, pathPerfil} from "../../routers/Paths.tsx";
 
 const options = [
