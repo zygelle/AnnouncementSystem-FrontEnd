@@ -1,0 +1,7 @@
+export const pathLogin = '/login'
+export const pathCreateAds = '/criar-anuncio'
+export const pathFilterAd = '/buscar-anuncio'
+export const pathHome = '/'
+export const pathCommunication = '/comunicacao'
+export const pathPerfil = '/meu-perfil'
+export const pathMeusAnuncios = '/meus-anuncios'

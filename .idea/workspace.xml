@@ -5,14 +5,19 @@
   </component>
   <component name="ChangeListManager">
     <list default="true" id="35ff04e5-b045-4abf-88bf-1c0d3c472492" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/AnnouncementSystem-FrontEnd/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/AnnouncementSystem-FrontEnd/package-lock.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AnnouncementSystem-FrontEnd/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/AnnouncementSystem-FrontEnd/package.json" afterDir="false" />
-      <change beforePath="$PROJECT_DIR$/AnnouncementSystem-FrontEnd/src/pages/home/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/AnnouncementSystem-FrontEnd/src/pages/home/index.tsx" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
+  </component>
+  <component name="FileTemplateManagerImpl">
+    <option name="RECENT_TEMPLATES">
+      <list>
+        <option value="TypeScript JSX File" />
+      </list>
+    </option>
   </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
@@ -30,6 +35,7 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "dart.analysis.tool.window.visible": "false",
+    "git-widget-placeholder": "fix/navbar-e-rotas",
     "kotlin-language-version-configured": "true",
     "last_opened_file_path": "C:/Users/guari/Documents/Projetos/Engenharia de Software/AnnouncementSystem-FrontEnd",
     "node.js.detected.package.eslint": "true",
@@ -39,10 +45,19 @@
     "nodejs_package_manager_path": "npm",
     "npm.build.executor": "Run",
     "npm.dev.executor": "Run",
-    "ts.external.directory.path": "C:\\Program Files\\JetBrains\\IntelliJ IDEA 2024.2.3\\plugins\\javascript-plugin\\jsLanguageServicesImpl\\external",
+    "ts.external.directory.path": "C:\\Users\\guari\\Documents\\Projetos\\Engenharia de Software\\AnnouncementSystem-FrontEnd\\AnnouncementSystem-FrontEnd\\node_modules\\typescript\\lib",
     "vue.rearranger.settings.migration": "true"
   }
 }]]></component>
+  <component name="RecentsManager">
+    <key name="MoveFile.RECENT_KEYS">
+      <recent name="C:\Users\guari\Documents\Projetos\Engenharia de Software\AnnouncementSystem-FrontEnd\AnnouncementSystem-FrontEnd\src\pages\anuncio\meu-anuncios" />
+      <recent name="C:\Users\guari\Documents\Projetos\Engenharia de Software\AnnouncementSystem-FrontEnd\AnnouncementSystem-FrontEnd\src\pages\perfil" />
+      <recent name="C:\Users\guari\Documents\Projetos\Engenharia de Software\AnnouncementSystem-FrontEnd\AnnouncementSystem-FrontEnd\src\pages\communication" />
+      <recent name="C:\Users\guari\Documents\Projetos\Engenharia de Software\AnnouncementSystem-FrontEnd\AnnouncementSystem-FrontEnd\src\services" />
+      <recent name="C:\Users\guari\Documents\Projetos\Engenharia de Software\AnnouncementSystem-FrontEnd\AnnouncementSystem-FrontEnd\src\routers" />
+    </key>
+  </component>
   <component name="RunManager">
     <configuration name="dev" type="js.build_tools.npm" nameIsGenerated="true">
       <package-json value="$PROJECT_DIR$/AnnouncementSystem-FrontEnd/package.json" />
