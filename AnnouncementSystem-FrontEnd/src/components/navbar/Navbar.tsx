@@ -49,7 +49,7 @@ function Navbar() {
     ];
 
     return (
-        <nav className="flex flex-col sm:flex-row sm:justify-between gap-4 sm:gap-8 items-center p-3 mb-0 mx-auto w-full bg-white border-b border-zinc-300 sm:px-5 overflow-hidden">
+        <nav className="flex flex-col sm:flex-row sm:justify-between gap-4 sm:gap-8 items-center p-4 mb-0 mx-auto w-full bg-white border-b border-zinc-300 sm:px-5 overflow-hidden">
             <div className="flex justify-start">
                 <Link to={pathHome}>
                     <img
