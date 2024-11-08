@@ -1,7 +1,11 @@
 export const pathLogin = '/login'
-export const pathCreateAds = '/criar-anuncio'
-export const pathFilterAd = '/buscar-anuncio'
+export const pathCreateAds = '/anuncio/criar'
+export const pathFilterAd = '/anuncio/buscar'
 export const pathHome = '/'
-export const pathCommunication = '/comunicacao'
-export const pathPerfil = '/meu-perfil'
-export const pathMeusAnuncios = '/meus-anuncios'
+export const pathCommunication = '/perfil/comunicacao'
+export const pathPerfil = '/perfil'
+export const pathMeusAnuncios = '/perfil/anununcios'
+export const pathVisualizarAnuncio = `/anunico/:id`
+export const setPathVisualizarAnuncio = (id: string) => {
+    return `/anunico/${id}`
+}

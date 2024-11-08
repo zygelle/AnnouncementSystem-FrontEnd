@@ -7,7 +7,7 @@ import {
     pathHome,
     pathLogin,
     pathMeusAnuncios,
-    pathPerfil
+    pathPerfil, pathVisualizarAnuncio
 } from "./Paths.tsx";
 import {Login} from "../pages/login/Login.tsx";
 import {Home} from "../pages/home/Home.tsx";
@@ -15,8 +15,9 @@ import {CriarAnuncio} from "../pages/anuncio/criar";
 import Navbar from "../components/Navbar.tsx";
 import Communication from "../pages/communication/Communication.tsx";
 import Perfil from "../pages/perfil/Perfil.tsx";
-import MeusAnuncios from "../pages/anuncio/meu-anuncios/MeusAnuncios.tsx";
-import BuscarAnuncios from "../pages/anuncio/buscar/BuscarAnuncios.tsx";
+import MeusAnuncios from "../pages/anuncio/MeusAnuncios.tsx";
+import BuscarAnuncios from "../pages/anuncio/BuscarAnuncios.tsx";
+import VisualizarAnuncio from "../pages/anuncio/VisualizarAnuncio.tsx";
 
 const ProtectedRoute = () => {
     return isAuthenticated() ? <Outlet /> : <Navigate to={pathLogin} />;
@@ -62,6 +63,10 @@ const router = createBrowserRouter([
                 {
                     path: pathMeusAnuncios,
                     element: <MeusAnuncios/>
+                },
+                {
+                    path: pathVisualizarAnuncio,
+                    element: <VisualizarAnuncio/>
                 }
             ]
         }]

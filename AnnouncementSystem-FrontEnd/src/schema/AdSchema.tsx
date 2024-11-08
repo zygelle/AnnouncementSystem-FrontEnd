@@ -40,13 +40,14 @@ export const AdSchema = z.object({
     id: z.string(),
     title: z.string(),
     content: z.string(),
-    price: z.number(),
+    price: z.number().nullable().optional(),
     date: z.string(),
+    deletionDate: z.string().nullable().optional(),
     status: z.string(),
     author: AuthorSchema,
     city: CitySchema,
     categories: z.array(CategorySchema),
-    files: z.array(FileSchema),
+    files: z.array(FileSchema).nullable().optional(),
 });
 
 export const PaginatedAdsSchema = z.object({
