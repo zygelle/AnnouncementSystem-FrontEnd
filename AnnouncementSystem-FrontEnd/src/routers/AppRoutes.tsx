@@ -12,7 +12,7 @@ import {
 import {Login} from "../pages/login/Login.tsx";
 import {Home} from "../pages/home/Home.tsx";
 import {CriarAnuncio} from "../pages/anuncio/criar";
-import Navbar from "../components/navbar/Navbar.tsx";
+import Navbar from "../components/Navbar.tsx";
 import Communication from "../pages/communication/Communication.tsx";
 import Perfil from "../pages/perfil/Perfil.tsx";
 import MeusAnuncios from "../pages/anuncio/meu-anuncios/MeusAnuncios.tsx";

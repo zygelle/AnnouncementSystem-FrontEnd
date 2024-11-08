@@ -1,12 +1,12 @@
-import { z } from "zod";
+import {z} from "zod";
 
 export const FilterRequestSchema = z.object({
     title: z.string().optional(),
     content: z.string().optional(),
     cities: z.array(z.string()).nullable().optional(),
     categories: z.array(z.string()).nullable().optional(),
-    minPrice: z.number().nullable().optional(),
-    maxPrice: z.number().nullable().optional(),
+    minPrice: z.number().min(0, { message: "O preço mínimo não pode ser negativo" }).nullable().optional(),
+    maxPrice: z.number().min(0, { message: "O preço máximo não pode ser negativo" }).nullable().optional(),
     userType: z.string().nullable().optional(),
 });
 
@@ -17,14 +17,18 @@ export const CategorySchema = z.object({
     name: z.string(),
 });
 
+export type Category = z.infer<typeof CategorySchema>
+
 export const CitySchema = z.object({
     id: z.string(),
     name: z.string(),
 });
 
+export type City = z.infer<typeof CitySchema>
+
 export const AuthorSchema = z.object({
     email: z.string().email(),
-    nome: z.string(),
+    name: z.string(),
 });
 
 export const FileSchema = z.object({

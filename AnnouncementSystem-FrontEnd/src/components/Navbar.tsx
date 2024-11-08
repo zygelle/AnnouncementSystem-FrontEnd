@@ -7,8 +7,8 @@ import {
     pathHome, pathLogin,
     pathMeusAnuncios,
     pathPerfil
-} from "../../routers/Paths.tsx";
-import {logout} from "../../services/token.tsx";
+} from "../routers/Paths.tsx";
+import {logout} from "../services/token.tsx";
 
 interface NavigationItemProps {
     label: string;

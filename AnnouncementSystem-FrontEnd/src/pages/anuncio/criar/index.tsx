@@ -1,4 +1,4 @@
-import  Header  from '../../../components/navbar/Navbar.tsx';
+import  Header  from '../../../components/Navbar.tsx';
 import { useState } from "react";
 import {Input} from '../../../components/forms/Input'
 import { Textarea } from '../../../components/forms/Textarea';
