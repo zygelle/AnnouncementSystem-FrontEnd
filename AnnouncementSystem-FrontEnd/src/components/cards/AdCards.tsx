@@ -1,6 +1,7 @@
 import {Ad} from "../../schema/AdSchema.tsx";
 import {Link} from "react-router-dom";
 import React from "react";
+import {setPathVisualizarAnuncio} from "../../routers/Paths.tsx";
 
 interface OptionAdCardsProps {
     ad: Ad;
@@ -35,7 +36,7 @@ const AdCardsOptional: React.FC<OptionAdCardsProps> = ({ ad }) => {
                     </p>
 
                     <div className="mt-1 flex justify-end w-full">
-                        <Link to={`/ads/${ad.id}`} className="text-sm font-semibold text-blue-600 hover:underline">
+                        <Link to={setPathVisualizarAnuncio(ad.id)} className="text-sm font-semibold text-blue-600 hover:underline">
                             Mais informações...
                         </Link>
                     </div>
@@ -47,10 +48,10 @@ const AdCardsOptional: React.FC<OptionAdCardsProps> = ({ ad }) => {
 
                 <div
                     className="flex gap-4 items-center mt-4 w-full leading-none whitespace-nowrap font-[number:var(--sds-typography-body-font-weight-regular)] text-[color:var(--sds-color-text-brand-on-brand)] text-[length:var(--sds-typography-body-size-medium)] max-md:max-w-full">
-                    {ad.price > 0 && (
-                        <span className="text-lg font-semibold text-gray-900 mb-2">
-                            R${ad.price.toFixed(2)}
-                        </span>
+                    {ad.price != null && ad.price > 0 && (
+                        <p className="mt-4 text-lg font-semibold text-gray-800">
+                            Preço: R$ {ad.price.toFixed(2)}
+                        </p>
                     )}
                 </div>
 
@@ -72,7 +73,7 @@ const AdCardsOptional: React.FC<OptionAdCardsProps> = ({ ad }) => {
 
             </div>
 
-            {ad.files.length > 0 && (
+            {ad.files && ad.files.length > 0 && (
                 <img
                     loading="lazy"
                     src=""

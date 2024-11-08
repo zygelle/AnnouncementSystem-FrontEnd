@@ -1,3 +1,32 @@
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
+
+.grid-layout{
+    width: 100%;
+    display: grid;
+    align-items: center;
+    justify-content: center;
+    grid-template-columns: 1fr;
+    grid-template-rows: max-content auto;
+    row-gap: 1.1rem;
+    justify-items: center;
+    background-color: #f1f5f9;
+    height: 100%;
+    min-height: 100vh;
+    padding-bottom: 1.1rem;
+}
+
+main{
+    background-color: white;
+    max-width: 45rem;
+    height: fit-content;
+    min-height: 100%;
+    display: flex;
+    margin: 0 1rem;
+    flex-direction: column;
+    justify-content: center;
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+    border-radius: 15px;
+    padding: 2rem;
+}
