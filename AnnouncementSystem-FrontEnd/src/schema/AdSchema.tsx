@@ -31,11 +31,6 @@ export const AuthorSchema = z.object({
     name: z.string(),
 });
 
-export const FileSchema = z.object({
-    id: z.string(),
-    path: z.string(),
-});
-
 export const AdSchema = z.object({
     id: z.string(),
     title: z.string(),
@@ -47,7 +42,7 @@ export const AdSchema = z.object({
     author: AuthorSchema,
     city: CitySchema,
     categories: z.array(CategorySchema),
-    files: z.array(FileSchema).nullable().optional(),
+    imageArchive: z.string().nullable().optional(),
 });
 
 export const PaginatedAdsSchema = z.object({

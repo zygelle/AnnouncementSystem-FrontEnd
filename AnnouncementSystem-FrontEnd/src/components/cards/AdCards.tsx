@@ -1,7 +1,10 @@
 import {Ad} from "../../schema/AdSchema.tsx";
-import {Link} from "react-router-dom";
-import React from "react";
+import {Link, useNavigate} from "react-router-dom";
+import React, {useEffect, useState} from "react";
 import {setPathVisualizarAnuncio} from "../../routers/Paths.tsx";
+import {getDownloadURL, listAll, ref} from "firebase/storage";
+import {storage} from "../../services/firebaseConfig.tsx";
+import '../../styles/adCard.css'
 
 interface OptionAdCardsProps {
     ad: Ad;
@@ -10,7 +13,6 @@ interface OptionAdCardsProps {
 const AdCardsOptional: React.FC<OptionAdCardsProps> = ({ ad }) => {
 
     const truncatedContent = ad.content.split('\n').slice(0, 4).join('\n');
-
     const formatDate = (date: string) => {
         const options: Intl.DateTimeFormatOptions = {
             day: '2-digit',
@@ -19,70 +21,97 @@ const AdCardsOptional: React.FC<OptionAdCardsProps> = ({ ad }) => {
         };
         return new Date(date).toLocaleDateString('pt-BR', options);
     };
+    const [imageSrc, setImageSrc] = useState('/images/img-padrao.PNG');
+    const [imageList, setImageList] = useState<string[]>([]);
+    const naviagte = useNavigate();
+
+    const getCategoryClass = (index: number) => {
+        const colors = [
+            'bg-blue-500',
+            'bg-green-500',
+            'bg-yellow-500',
+            'bg-red-500',
+            'bg-purple-500',
+            'bg-pink-500',
+        ];
+        return colors[index % colors.length]; // Aplique um ciclo de cores caso tenha mais categorias que cores
+    };
+
+    const fetchImages = (id: string) => {
+        const imageListRef = ref(storage, `${id}/`)
+        listAll(imageListRef).then((response) => {
+            response.items.forEach((item) => {
+                getDownloadURL(item).then((url) => {
+                    setImageList((prevState) => [...prevState, url]);
+                })
+            })
+        })
+        if (imageList.length > 0) {
+            const randomIndex = Math.floor(Math.random() * imageSrc.length);
+            setImageSrc(imageSrc[randomIndex]);
+        }
+    }
+
+    useEffect(() => {
+        if (ad.imageArchive != null) fetchImages(ad.imageArchive);
+    }, []);
+
+    function handleNavigate(){
+        naviagte(setPathVisualizarAnuncio(ad.id))
+    }
 
     return (
-        <article className="flex flex-wrap gap-6 items-start p-6 mt-6 w-full bg-white rounded-lg border border-solid border-zinc-300 min-w-[240px] max-md:px-5 max-md:max-w-full relative">
-
-            <div className="flex flex-col flex-1 shrink basis-0 min-w-[160px] max-md:max-w-full">
-
-                <div className="flex flex-col w-full max-md:max-w-full">
-
-                    <h2 className="tracking-tight leading-tight text-xl font-semibold max-md:max-w-full">
+        <div className="ad-card" onClick={handleNavigate}>
+            <div className="ad-card-item first-line">
+                <div className="ad-card-col text-sm">
+                    {formatDate(ad.date)}
+                </div>
+                <div className="ad-card-col flex justify-end text-sm">
+                    {ad.city.name}
+                </div>
+            </div>
+            <div className="ad-card-item second-line">
+                <div className="ad-card-col">
+                    <div className="text-lg mb-2 font-bold">
                         {ad.title}
-                    </h2>
-
-                    <p className="mt-2 leading-snug text-gray-600 text-[length:var(--sds-typography-body-size-medium)] max-md:max-w-full">
+                    </div>
+                    <div>
                         {truncatedContent}
-                    </p>
-
-                    <div className="mt-1 flex justify-end w-full">
-                        <Link to={setPathVisualizarAnuncio(ad.id)} className="text-sm font-semibold text-blue-600 hover:underline">
-                            Mais informações...
-                        </Link>
+                    </div>
+                    <div>
+                        {ad.price != null && ad.price > 0 && (
+                            <p className="text-sm flex justify-end my-2">
+                                Preço: R$ {ad.price.toFixed(2)}
+                            </p>
+                        )}
                     </div>
                 </div>
-
-                <span className="absolute top-2 right-4 text-sm text-gray-500">
-                    {formatDate(ad.date)}
-                </span>
-
-                <div
-                    className="flex gap-4 items-center mt-4 w-full leading-none whitespace-nowrap font-[number:var(--sds-typography-body-font-weight-regular)] text-[color:var(--sds-color-text-brand-on-brand)] text-[length:var(--sds-typography-body-size-medium)] max-md:max-w-full">
-                    {ad.price != null && ad.price > 0 && (
-                        <p className="mt-4 text-lg font-semibold text-gray-800">
-                            Preço: R$ {ad.price.toFixed(2)}
-                        </p>
-                    )}
+                <div className="ad-card-col w-fit flex justify-center sm:justify-end">
+                    <img
+                        src={imageSrc}
+                        alt={"Imagem do Anuncio"}
+                        className="w-8/12"
+                    />
                 </div>
-
-                <div className="absolute bottom-2 left-4 text-sm text-gray-500 flex gap-2">
-                    {ad.categories.slice(0, 2).map((category, index) => (
-                        <span key={index}>
-                    {category.name}
-                            {index < ad.categories.length - 1 && ', '}
-                </span>
+            </div>
+            <div className="ad-card-item">
+                <div className="ad-card-col text-md">
+                    {ad.categories.map((category, index) => (
+                        <span
+                            key={category.id}
+                            className={`inline-block px-3 py-1 m-1 rounded-full text-white text-sm ${getCategoryClass(index)}`}
+                        >
+            {               category.name}
+                        </span>
                     ))}
-                    {ad.categories.length > 2 && <span>...</span>}
                 </div>
-
-                <div className="absolute bottom-2 right-4 text-sm text-gray-500">
+                <div className="ad-card-col flex justify-end text-sm">
                     <Link to={`/author/${ad.author.email}`} className="hover:underline">
                         {ad.author.name}
                     </Link>
                 </div>
-
             </div>
-
-            {ad.files && ad.files.length > 0 && (
-                <img
-                    loading="lazy"
-                    src=""
-                    alt="Arquivo do anúncio"
-                    className="object-contain m-3 shrink-0 w-40 aspect-square min-h-[160px] min-w-[160px]"
-                />
-            )}
-
-        </article>
+        </div>
 
     );
 };

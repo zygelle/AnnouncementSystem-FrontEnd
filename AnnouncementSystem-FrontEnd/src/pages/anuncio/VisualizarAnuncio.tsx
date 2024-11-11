@@ -61,17 +61,7 @@ function VisualizarAnuncio() {
                 </p>
             </div>
 
-            {ad.files && ad.files.length > 0 && (
-                <div className="carousel mb-6">
-                    {ad.files.map((id, path) => (
-                        <img
-                            src=""
-                            alt={`Imagem ${id}`}
-                            className="w-full object-cover rounded-md"
-                        />
-                    ))}
-                </div>
-            )}
+            {/* Imagens */}
 
             <div className="flex justify-center mb-3">
                 <h1 className="text-2xl font-semibold text-gray-900">{ad.title}</h1>

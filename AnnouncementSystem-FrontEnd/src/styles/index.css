@@ -17,16 +17,24 @@
     padding-bottom: 1.1rem;
 }
 
-main{
+main {
     background-color: white;
-    max-width: 45rem;
     height: fit-content;
     min-height: 100%;
-    display: flex;
-    margin: 0 1rem;
-    flex-direction: column;
-    justify-content: center;
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     border-radius: 15px;
     padding: 2rem;
+    width: 90%;
+    max-width: 1200px;
+    margin: 0 auto;
+
+    display: flex;
+    flex-direction: column;
 }
+
+@media (min-width: 1024px) {
+    main {
+        width: 60%;
+    }
+}
+

@@ -19,6 +19,7 @@
     "@material-tailwind/react": "^2.1.10",
     "announcementsystem-frontend": "file:",
     "axios": "^1.7.7",
+    "firebase": "^11.0.1",
     "localforage": "^1.10.0",
     "match-sorter": "^7.0.0",
     "pure-react-carousel": "^1.30.1",

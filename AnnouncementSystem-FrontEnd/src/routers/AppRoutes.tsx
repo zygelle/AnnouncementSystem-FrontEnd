@@ -16,7 +16,7 @@ import Navbar from "../components/Navbar.tsx";
 import Communication from "../pages/communication/Communication.tsx";
 import Perfil from "../pages/perfil/Perfil.tsx";
 import MeusAnuncios from "../pages/anuncio/MeusAnuncios.tsx";
-import BuscarAnuncios from "../pages/anuncio/BuscarAnuncios.tsx";
+import Anuncios from "../pages/anuncio/Anuncios.tsx";
 import VisualizarAnuncio from "../pages/anuncio/VisualizarAnuncio.tsx";
 
 const ProtectedRoute = () => {
@@ -50,7 +50,7 @@ const router = createBrowserRouter([
                 },
                 {
                     path: pathFilterAd,
-                    element: <BuscarAnuncios/>
+                    element: <Anuncios/>
                 },
                 {
                     path: pathCommunication,

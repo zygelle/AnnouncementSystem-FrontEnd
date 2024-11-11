@@ -1,9 +1,13 @@
-export const getToken = localStorage.getItem("accessToken");
-export const getEmail = localStorage.getItem("email");
-export const isAuthenticated = () => {
-    return localStorage.getItem("accessToken") != null;
+export const getToken = () => {
+    return localStorage.getItem("accessToken");
+};
+export const getEmail = () => {
+    return localStorage.getItem("email");
 }
+export const isAuthenticated = () => {
+    return getToken() != null;
+};
 export const logout = () => {
     localStorage.removeItem("accessToken");
-    localStorage.removeItem("email")
-}
+    localStorage.removeItem("email");
+};
