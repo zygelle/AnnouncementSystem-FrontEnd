@@ -4,6 +4,7 @@ import React, {useEffect, useState} from "react";
 import {setPathVisualizarAnuncio} from "../../routers/Paths.tsx";
 import {getDownloadURL, listAll, ref} from "firebase/storage";
 import {storage} from "../../services/firebaseConfig.tsx";
+import '../../styles/adCard.css'
 
 interface OptionAdCardsProps {
     ad: Ad;
@@ -22,7 +23,19 @@ const AdCardsOptional: React.FC<OptionAdCardsProps> = ({ ad }) => {
     };
     const [imageSrc, setImageSrc] = useState('/images/img-padrao.PNG');
     const [imageList, setImageList] = useState<string[]>([]);
-    const naviagte = useNavigate()
+    const naviagte = useNavigate();
+
+    const getCategoryClass = (index: number) => {
+        const colors = [
+            'bg-blue-500',
+            'bg-green-500',
+            'bg-yellow-500',
+            'bg-red-500',
+            'bg-purple-500',
+            'bg-pink-500',
+        ];
+        return colors[index % colors.length]; // Aplique um ciclo de cores caso tenha mais categorias que cores
+    };
 
     const fetchImages = (id: string) => {
         const imageListRef = ref(storage, `${id}/`)
@@ -59,6 +72,9 @@ const AdCardsOptional: React.FC<OptionAdCardsProps> = ({ ad }) => {
             </div>
             <div className="ad-card-item second-line">
                 <div className="ad-card-col">
+                    <div className="text-lg mb-2 font-bold">
+                        {ad.title}
+                    </div>
                     <div>
                         {truncatedContent}
                     </div>
@@ -80,12 +96,14 @@ const AdCardsOptional: React.FC<OptionAdCardsProps> = ({ ad }) => {
             </div>
             <div className="ad-card-item">
                 <div className="ad-card-col text-md">
-                    <span>
-                        {ad.categories[0]?.name}
-                        {ad.categories.length > 1 &&
-                            <span>, ...</span>
-                        }
-                    </span>
+                    {ad.categories.map((category, index) => (
+                        <span
+                            key={category.id}
+                            className={`inline-block px-3 py-1 m-1 rounded-full text-white text-sm ${getCategoryClass(index)}`}
+                        >
+            {               category.name}
+                        </span>
+                    ))}
                 </div>
                 <div className="ad-card-col flex justify-end text-sm">
                     <Link to={`/author/${ad.author.email}`} className="hover:underline">

@@ -7,7 +7,7 @@ import AdCardsOptional from "../../components/cards/AdCards.tsx";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter, faBroom } from '@fortawesome/free-solid-svg-icons';
 
-function BuscarAnuncios() {
+function Anuncios() {
 
     const [ads, setAds] = useState<Ad[]>([]);
     const [page, setPage] = useState<number>(0);
@@ -29,7 +29,6 @@ function BuscarAnuncios() {
         setLoading(true);
         try {
             const validation = FilterRequestSchema.safeParse(filter);
-
             if (!validation.success) {
                 console.error("Erro de validação dos dados de requisição", validation.error);
                 return;
@@ -49,15 +48,15 @@ function BuscarAnuncios() {
         }
     };
 
-
-    useEffect(() => {
-        fetchAds();
-    }, [page, filter, ]);
-
     const handleFilterChange = (newFilters: FilterRequest) => {
         setIsFilter(true)
         setFilter(newFilters);
     };
+
+    useEffect(() => {
+        fetchAds()
+    }, [page, filter]);
+
 
     const openOffcanvas = () => setIsOffcanvasOpen(true);
     const closeOffcanvas = () => setIsOffcanvasOpen(false);
@@ -132,4 +131,4 @@ function BuscarAnuncios() {
     );
 }
 
-export default BuscarAnuncios;
+export default Anuncios;

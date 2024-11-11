@@ -34,24 +34,20 @@ const options = [
 
 export function Home() {
     return(
-        <div className="main-layout">
-
-            <main className="main-content">
-                <section className="flex flex-col max-w-full leading-tight w-[287px]">
-                    <h1 className="text-xl font-medium">
-                        Bem-vindo ao Balcão UFF
-                    </h1>
-                    <p className="mt-2 text-gray-600">
-                        Escolha uma opção bla bla bla
-                    </p>
-                </section>
-                <section className="flex flex-col w-full max-md:mt-10 max-md:max-w-full">
-                    {options.map((option, index) => (
+        <main>
+            <section className="flex flex-col max-w-full leading-tight w-[287px]">
+                <h1 className="text-xl font-medium">
+                    Bem-vindo ao Balcão UFF
+                </h1>
+                <p className="mt-2 text-gray-600">
+                    Escolha uma opção bla bla bla
+                </p>
+            </section>
+            <section className="flex flex-col w-full max-md:mt-10 max-md:max-w-full">
+                {options.map((option, index) => (
                     <OptionCard key={index} {...option} />
-                    ))}
-                </section>
-            </main>
-            
-        </div>
+                ))}
+            </section>
+        </main>
     )
 }
