@@ -1,12 +1,14 @@
 import  Header  from '../../../components/header';
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from '../../../components/forms/Input'
 import { Textarea } from '../../../components/forms/Textarea';
 import CreatableSelect from 'react-select/creatable';
+import PhotoUpload from '../../../components/photoUpload/PhotoUpload';
 
 import api from '../../../services/api';
 import { z } from 'zod';
+import { v4 } from 'uuid';
 
 const anuncioSchema = z.object({
     title: z.string().min(1, 'O título não pode ser vazio'),
@@ -22,14 +24,21 @@ export function CriarAnuncio(){
     const [content, setContent] = useState('');
     const [city, setCity] = useState('');
     const [categories, setCategories] = useState([]);
-    const [paths, setPaths] = useState([]);
+    const [imageArchive, setImageArchive] = useState('');
     const [price, setPrice] = useState('');
     const [errors, setErrors] = useState({});
     const navigate = useNavigate();
     const accessToken = localStorage.getItem('accessToken');
 
+    const [nomeArquivo, setNomeArquivo] = useState<string>('');
+    useEffect(() => { setNomeArquivo(v4().toString()) }, []);
+
     const handleChangeCategories = (selectedOptions) => {
         setCategories(selectedOptions || []);
+    };
+
+    const handleUploadComplete = (url) => {
+        setImageArchive(url);
     };
 
     async function criar(e) {
@@ -42,8 +51,8 @@ export function CriarAnuncio(){
             content,
             city,
             categories: categoriesValues,
-            paths,
-            price: parseFloat(price)
+            price: parseFloat(price),
+            imageArchive,
         }
 
         const result = anuncioSchema.safeParse(data);
@@ -63,14 +72,13 @@ export function CriarAnuncio(){
             });
 
             alert("Anúncio salvo com sucesso");
-
             navigate('/home');
             
             setTitle('');
             setContent('');
             setCity('');
             setCategories([]);
-            setPaths([]);
+            setImageArchive('');
             setPrice('');
         } catch (error) {
             alert("Erro ao criar anúncio");
@@ -81,6 +89,12 @@ export function CriarAnuncio(){
         <div className="flex flex-col bg-slate-100 items-center justify-center">
             <Header/>
             <main className="w-full max-w-3xl flex flex-col p-8 rounded-lg bg-white shadow-2x mb-20">
+                <div className="flex flex-col items-center mb-6">
+                    <PhotoUpload
+                        nomeArquivo={nomeArquivo}
+                        onUploadComplete={handleUploadComplete}
+                    />
+                </div>
                 <div className="gap-2.5 mt-5 max-w-full">
                     <form onSubmit={criar} className="grid grid-cols-2 gap-6">
                         <div className="flex flex-col gap-4">
