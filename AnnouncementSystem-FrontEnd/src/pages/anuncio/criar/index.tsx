@@ -1,160 +1,176 @@
-import  Header  from '../../../components/Navbar.tsx';
-import { useState } from "react";
-import {Input} from '../../../components/forms/Input'
+import { useEffect, useState } from "react";
+import { useNavigate } from "react-router-dom";
+import { Input } from '../../../components/forms/Input'
 import { Textarea } from '../../../components/forms/Textarea';
 import CreatableSelect from 'react-select/creatable';
-import Carousel from "react-multi-carousel";
-import "react-multi-carousel/lib/styles.css";
+import PhotoUpload from '../../../components/photoUpload/PhotoUpload';
 
+import api from '../../../services/api';
+import { z } from 'zod';
+import { v4 } from 'uuid';
+import { pathHome } from "../../../routers/Paths";
 
-
-const responsive = {
-    desktop: {
-      breakpoint: { max: 3000, min: 1024 },
-      items: 1,
-      slidesToSlide: 1 // optional, default to 1.
-    },
-    tablet: {
-      breakpoint: { max: 1024, min: 464 },
-      items: 1,
-      slidesToSlide: 1 // optional, default to 1.
-    },
-    mobile: {
-      breakpoint: { max: 464, min: 0 },
-      items: 1,
-      slidesToSlide: 1 // optional, default to 1.
-    }
-  };
-
-  const dogOptions = [
-    { value: 'Chihuahua' , label: 'Chihuahua'},
-    { value: 'Bulldog', label: 'Bulldog' },
-    { value: 'Dachshund', label: 'Dachshund' },
-    { value: 'Akita', label: 'Akita' },
-  ];
-
-  const catOptions = [
-    {value: 'cat1', label: 'cat1'}
-
-  ]
+const anuncioSchema = z.object({
+    title: z.string().min(1, 'O título não pode ser vazio'),
+    content: z.string().min(1, 'A descrição não pode ser vazia'),
+    city: z.string().min(1, 'A cidade não pode ser vazia'),
+    categories: z.array(z.string()).min(1, 'Escolha ao menos uma categoria'),
+    paths: z.array(z.string()).optional(),
+    price: z.number().nonnegative('O preço não pode ser negativo'),
+});
 
 export function CriarAnuncio(){
-    const [descricao, setDescricao] = useState('');
-    const [preco, setPreco] = useState('');
-    const [email, setEmail] = useState('')
-    
+    const [title, setTitle] = useState('');
+    const [content, setContent] = useState('');
+    const [city, setCity] = useState('');
+    const [categories, setCategories] = useState([]);
+    const [imageArchive, setImageArchive] = useState('');
+    const [price, setPrice] = useState('');
+    const [errors, setErrors] = useState({});
+    const navigate = useNavigate();
+    const accessToken = localStorage.getItem('accessToken');
 
+    const [nomeArquivo, setNomeArquivo] = useState<string>('');
+    useEffect(() => { setNomeArquivo(v4().toString()) }, []);
 
-     async function criar(e) {
+    const handleChangeCategories = (selectedOptions) => {
+        setCategories(selectedOptions || []);
+    };
+
+    const handleUploadComplete = (url) => {
+        console.log("Essa é a url: " + url)
+        setImageArchive(url);
+    };
+
+    async function criar(e) {
         e.preventDefault();
 
+        const categoriesValues = categories.map(option => option.value);
+
         const data = {
-            descricao,
-            preco,
-            email
-            
+            title,
+            content,
+            city,
+            categories: categoriesValues,
+            price: parseFloat(price),
+            imageArchive,
         }
 
-        
-     }
-    return(
+        const result = anuncioSchema.safeParse(data);
+        if (!result.success) {
+            const errorMessages = result.error.format();
+            setErrors(errorMessages);
+            return;
+        }
 
-        <div className="main-layout">
-            <main className="main-content">
-                <div className="gap-2.5 mt-5 max-w-full ">
-                    <form onSubmit={criar} className='grid grid-cols-6 gap-4' >
+        console.log('Payload enviado:', data);
 
-                    <Carousel className='col-span-2 col-start-3 col-end-5 row-span-4' responsive={responsive}>
-                        <div>
-                            <img
-                            loading="lazy"
-                            src="https://cdn.builder.io/api/v1/image/assets/373b523e13e642948ff7f7e522970fd3/9834cd509f3acada339e69a8ce9444326495eb23a777014a17998b8de011849f?apiKey=373b523e13e642948ff7f7e522970fd3&"
+        try {
+            console.log('Imagem:' + data.imageArchive)
+            await api.post('announcement/create', data, {
+                headers: {
+                    Authorization: `Bearer ${accessToken}`
+                }
+            });
 
-                            className="object-contain w-52 aspect-[0.84] min-h-[247px]"
-                            />
-                        </div>
-                        <div>
-                            <img
-                            loading="lazy"
-                            src="https://cdn.builder.io/api/v1/image/assets/373b523e13e642948ff7f7e522970fd3/9834cd509f3acada339e69a8ce9444326495eb23a777014a17998b8de011849f?apiKey=373b523e13e642948ff7f7e522970fd3&"
+            alert("Anúncio salvo com sucesso");
+            navigate(pathHome);
+            
+            setTitle('');
+            setContent('');
+            setCity('');
+            setCategories([]);
+            setImageArchive('');
+            setPrice('');
+        } catch (error) {
+            alert("Erro ao criar anúncio");
+        }
+    }
 
-                            className="object-contain w-52 aspect-[0.84] min-h-[247px]"
-                            />
-                        </div>
-                       <div>
-                            <img
-                            loading="lazy"
-                            src="https://cdn.builder.io/api/v1/image/assets/373b523e13e642948ff7f7e522970fd3/9834cd509f3acada339e69a8ce9444326495eb23a777014a17998b8de011849f?apiKey=373b523e13e642948ff7f7e522970fd3&"
-
-                            className="object-contain w-52 aspect-[0.84] min-h-[247px]"
-                            />
-                        </div>
-                    </Carousel>
-
-                    <div className='col-start-3 col-span-1'>
-                        <Input name='radio' aria-label='busca' value="Busca" type='radio' className='border border-slate-300 rounded-md outline-none px-2 mb-4 '></Input>
-                        <label for="busca" className=' ml-2 align-top accent-black-100'>Busca</label>
-
-                    </div>
-
-                    <div className='col-start-4 col-span-1'>
-                        <Input name='radio' id="busca" aria-label='oferta' value="Oferta" type='radio' className='border border-slate-300 rounded-md outline-none px-2 mb-4 '></Input>
-                        <label for="oferta"className='ml-2 align-top'>Oferta</label>
-                    </div>
-
-                    <div className='col-span-3'>
-                        <label className="mb-2">Descricao do Anuncio</label>
-                        <Textarea rows="4"></Textarea>
-
-
-                    </div>
-                    <div className='col-span-3'>
-                        <label className='mb-2'>Localização</label>
-                        <CreatableSelect isClearable isMulti className='mb-2 w-full' options={dogOptions} placeholder="Cidade"/>
-                        <label className='mb-2'>Categorias</label>
-                        <CreatableSelect isClearable isMulti className='mb-2' options={catOptions} placeholder="Categorias"/>
-
-
-                    </div>
-                    <div className='col-span-3'>
-
-
-                    <label className="mb-2">Preço (R$)</label>
-                            <Input
-                                className='w-full border border-slate-300 h-9 rounded-md outline-none px-2 mb-4'
-                                placeholder="0.0"
-                                defaultValue="0.0"
-                                step={.01}
-                                type="number"
-                                value={preco}
-                                onChange={ (e) => setPreco(e.target.value) }
-                         />
-                    </div>
-                    <div className='col-span-3'>
-                        <label className="mb-2">Contato</label>
+    return (
+        <div className="flex flex-col bg-slate-100 items-center justify-center">
+            <main className="w-full max-w-3xl flex flex-col p-8 rounded-lg bg-white shadow-2x mb-20">
+                <div className="flex flex-col items-center mb-6">
+                    <PhotoUpload
+                        nomeArquivo={nomeArquivo}
+                        onUploadComplete={handleUploadComplete}
+                    />
+                </div>
+                <div className="gap-2.5 mt-5 max-w-full">
+                    <form onSubmit={criar} className="grid grid-cols-2 gap-6">
+                        <div className="flex flex-col gap-4">
+                            <div>
+                                <label className="mb-2">Título</label>
                                 <Input
                                     className='w-full border border-slate-300 h-9 rounded-md outline-none px-2 mb-4'
-                                    placeholder='Email'
+                                    placeholder='Título'
                                     type="text"
-                                    value={email}
-                                    onChange={ (e) => setEmail(e.target.value) }
-                            />
-                    </div>
-
-                    <button
-                        type="reset"
-                        className="col-start-3 h-9 hover:bg-slate-200 rounded border-slate-200 border-2 text-lg">
-                            Cancelar
-                        </button>
-                        <button
-                        type="submit"
-                        className="h-9 bg-blue-900 hover:bg-blue-700 rounded border-0 text-lg text-white">
-                            Anunciar
-                    </button>
-                </form>
+                                    value={title}
+                                    onChange={(e) => setTitle(e.target.value)}
+                                />
+                                {errors.title && <span className='text-red-600'>{errors.title._errors}</span>}
+                            </div>
+                            <div>
+                                <label className="mb-2">Descrição do Anúncio</label>
+                                <Textarea 
+                                    rows="4"
+                                    value={content}
+                                    onChange={(e) => setContent(e.target.value)}
+                                />
+                                {errors.content && <span className='text-red-600'>{errors.content._errors}</span>}
+                            </div>
+                            <div>
+                                <label className="mb-2">Localização</label>
+                                <Input
+                                    className='w-full border border-slate-300 h-9 rounded-md outline-none px-2 mb-4'
+                                    placeholder='Cidade'
+                                    type="text"
+                                    value={city}
+                                    onChange={(e) => setCity(e.target.value)}
+                                />
+                                {errors.city && <span className='text-red-600'>{errors.city._errors}</span>}
+                            </div>
+                        </div>
+                        <div className="flex flex-col gap-4">
+                            <div>
+                                <label className="mb-2">Categorias</label>
+                                <CreatableSelect 
+                                    isClearable 
+                                    isMulti 
+                                    className="mb-2"
+                                    onChange={handleChangeCategories} 
+                                    placeholder="Categorias"
+                                />
+                                {errors.categories && <span className='text-red-600'>{errors.categories._errors}</span>}
+                            </div>
+                            <div>
+                                <label className="mb-2">Preço (R$)</label>
+                                <Input
+                                    className='w-full border border-slate-300 h-9 rounded-md outline-none px-2 mb-4'
+                                    placeholder="0.0"
+                                    step={.01}
+                                    type="number"
+                                    value={price}
+                                    onChange={(e) => setPrice(e.target.value)}
+                                />
+                                {errors.price && <span className='text-red-600'>{errors.price._errors}</span>}
+                            </div>
+                        </div>
+                        <div className="col-span-2 flex justify-center gap-4">
+                            <button
+                                type="reset"
+                                className="h-9 hover:bg-slate-200 rounded border-slate-200 border-2 text-lg px-4">
+                                Cancelar
+                            </button>
+                            <button
+                                type="submit"
+                                className="h-9 bg-blue-900 hover:bg-blue-700 rounded border-0 text-lg text-white px-4">
+                                Anunciar
+                            </button>
+                        </div>
+                    </form>
                 </div>
             </main>
         </div>
-    )
-
+    );
 }
