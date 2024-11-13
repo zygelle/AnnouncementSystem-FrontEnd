@@ -1,31 +1,23 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="AutoImportSettings">
-    <option name="autoReloadType" value="SELECTIVE" />
-  </component>
   <component name="ChangeListManager">
     <list default="true" id="35ff04e5-b045-4abf-88bf-1c0d3c472492" name="Changes" comment="">
-      <change beforePath="$PROJECT_DIR$/.idea/workspace.xml" beforeDir="false" afterPath="$PROJECT_DIR$/.idea/workspace.xml" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AnnouncementSystem-FrontEnd/package-lock.json" beforeDir="false" afterPath="$PROJECT_DIR$/AnnouncementSystem-FrontEnd/package-lock.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AnnouncementSystem-FrontEnd/package.json" beforeDir="false" afterPath="$PROJECT_DIR$/AnnouncementSystem-FrontEnd/package.json" afterDir="false" />
+      <change beforePath="$PROJECT_DIR$/AnnouncementSystem-FrontEnd/src/pages/home/index.tsx" beforeDir="false" afterPath="$PROJECT_DIR$/AnnouncementSystem-FrontEnd/src/pages/home/index.tsx" afterDir="false" />
     </list>
     <option name="SHOW_DIALOG" value="false" />
     <option name="HIGHLIGHT_CONFLICTS" value="true" />
     <option name="HIGHLIGHT_NON_ACTIVE_CHANGELIST" value="false" />
     <option name="LAST_RESOLUTION" value="IGNORE" />
   </component>
-  <component name="FileTemplateManagerImpl">
-    <option name="RECENT_TEMPLATES">
-      <list>
-        <option value="TypeScript JSX File" />
-      </list>
-    </option>
-  </component>
   <component name="Git.Settings">
     <option name="RECENT_GIT_ROOT_PATH" value="$PROJECT_DIR$" />
   </component>
-  <component name="ProjectColorInfo">{
-  &quot;customColor&quot;: &quot;&quot;,
-  &quot;associatedIndex&quot;: 6
-}</component>
+  <component name="ProjectColorInfo"><![CDATA[{
+  "customColor": "",
+  "associatedIndex": 6
+}]]></component>
   <component name="ProjectId" id="2ngMsDH2M9wMeiLNme53GHe79fe" />
   <component name="ProjectViewState">
     <option name="hideEmptyMiddlePackages" value="true" />
@@ -35,49 +27,10 @@
   "keyToString": {
     "RunOnceActivity.ShowReadmeOnStart": "true",
     "dart.analysis.tool.window.visible": "false",
-    "git-widget-placeholder": "fix/navbar-e-rotas",
-    "kotlin-language-version-configured": "true",
-    "last_opened_file_path": "C:/Users/guari/Documents/Projetos/Engenharia de Software/AnnouncementSystem-FrontEnd",
-    "node.js.detected.package.eslint": "true",
-    "node.js.detected.package.tslint": "true",
-    "node.js.selected.package.eslint": "(autodetect)",
-    "node.js.selected.package.tslint": "(autodetect)",
-    "nodejs_package_manager_path": "npm",
-    "npm.build.executor": "Run",
-    "npm.dev.executor": "Run",
-    "ts.external.directory.path": "C:\\Users\\guari\\Documents\\Projetos\\Engenharia de Software\\AnnouncementSystem-FrontEnd\\AnnouncementSystem-FrontEnd\\node_modules\\typescript\\lib",
-    "vue.rearranger.settings.migration": "true"
+    "git-widget-placeholder": "main",
+    "last_opened_file_path": "C:/Users/Thinkpad L14/Documentos/GitHub/AnnouncementSystem-API"
   }
 }]]></component>
-  <component name="RecentsManager">
-    <key name="MoveFile.RECENT_KEYS">
-      <recent name="C:\Users\guari\Documents\Projetos\Engenharia de Software\AnnouncementSystem-FrontEnd\AnnouncementSystem-FrontEnd\src\pages\anuncio\meu-anuncios" />
-      <recent name="C:\Users\guari\Documents\Projetos\Engenharia de Software\AnnouncementSystem-FrontEnd\AnnouncementSystem-FrontEnd\src\pages\perfil" />
-      <recent name="C:\Users\guari\Documents\Projetos\Engenharia de Software\AnnouncementSystem-FrontEnd\AnnouncementSystem-FrontEnd\src\pages\communication" />
-      <recent name="C:\Users\guari\Documents\Projetos\Engenharia de Software\AnnouncementSystem-FrontEnd\AnnouncementSystem-FrontEnd\src\services" />
-      <recent name="C:\Users\guari\Documents\Projetos\Engenharia de Software\AnnouncementSystem-FrontEnd\AnnouncementSystem-FrontEnd\src\routers" />
-    </key>
-  </component>
-  <component name="RunManager">
-    <configuration name="dev" type="js.build_tools.npm" nameIsGenerated="true">
-      <package-json value="$PROJECT_DIR$/AnnouncementSystem-FrontEnd/package.json" />
-      <command value="run" />
-      <scripts>
-        <script value="dev" />
-      </scripts>
-      <node-interpreter value="project" />
-      <envs />
-      <method v="2" />
-    </configuration>
-  </component>
-  <component name="SharedIndexes">
-    <attachedChunks>
-      <set>
-        <option value="bundled-jdk-9823dce3aa75-28b599e66164-intellij.indexing.shared.core-IU-242.23726.103" />
-        <option value="bundled-js-predefined-d6986cc7102b-5c90d61e3bab-JavaScript-IU-242.23726.103" />
-      </set>
-    </attachedChunks>
-  </component>
   <component name="SpellCheckerSettings" RuntimeDictionaries="0" Folders="0" CustomDictionaries="0" DefaultDictionary="application-level" UseSingleDictionary="true" transferred="true" />
   <component name="TaskManager">
     <task active="true" id="Default" summary="Default task">
@@ -86,11 +39,7 @@
       <option name="number" value="Default" />
       <option name="presentableId" value="Default" />
       <updated>1729390474451</updated>
-      <workItem from="1730916155068" duration="797000" />
     </task>
     <servers />
-  </component>
-  <component name="TypeScriptGeneratedFilesManager">
-    <option name="version" value="3" />
   </component>
 </project>
