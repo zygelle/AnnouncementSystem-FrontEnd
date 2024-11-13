@@ -4,28 +4,28 @@ import {pathCommunication, pathCreateAds, pathFilterAd, pathPerfil} from "../../
 const options = [
     {
         title: "Criar anúncio",
-        description: "bla bla bla",
+        description: "",
         buttonText: "Criar",
         path: pathCreateAds,
         imageSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/9aa627ecd38eaebe6f53832aa6aabcab9f9185dafaabc75d40d1baf8707973de?placeholderIfAbsent=true&apiKey=373b523e13e642948ff7f7e522970fd3"
     },
     {
         title: "Buscar anúncio",
-        description: "bla bla bla",
+        description: "",
         buttonText: "Buscar",
         path: pathFilterAd,
         imageSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/9aa627ecd38eaebe6f53832aa6aabcab9f9185dafaabc75d40d1baf8707973de?placeholderIfAbsent=true&apiKey=373b523e13e642948ff7f7e522970fd3"
     },
     {
         title: "Comunicação",
-        description: "bla bla bla",
+        description: "",
         buttonText: "Acessar",
         path: pathCommunication,
         imageSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/9aa627ecd38eaebe6f53832aa6aabcab9f9185dafaabc75d40d1baf8707973de?placeholderIfAbsent=true&apiKey=373b523e13e642948ff7f7e522970fd3"
     },
     {
         title: "Perfil",
-        description: "bla bla bla",
+        description: "",
         buttonText: "Acessar",
         path: pathPerfil,
         imageSrc: "https://cdn.builder.io/api/v1/image/assets/TEMP/9aa627ecd38eaebe6f53832aa6aabcab9f9185dafaabc75d40d1baf8707973de?placeholderIfAbsent=true&apiKey=373b523e13e642948ff7f7e522970fd3"
@@ -40,7 +40,7 @@ export function Home() {
                     Bem-vindo ao Balcão UFF
                 </h1>
                 <p className="mt-2 text-gray-600">
-                    Escolha uma opção bla bla bla
+                    Escolha uma opção...
                 </p>
             </section>
             <section className="flex flex-col w-full max-md:mt-10 max-md:max-w-full">

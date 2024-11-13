@@ -1,4 +1,3 @@
-import  Header  from '../../../components/header';
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import { Input } from '../../../components/forms/Input'
@@ -9,6 +8,8 @@ import PhotoUpload from '../../../components/photoUpload/PhotoUpload';
 import api from '../../../services/api';
 import { z } from 'zod';
 import { v4 } from 'uuid';
+import { pathHome } from "../../../routers/Paths";
+
 
 const anuncioSchema = z.object({
     title: z.string().min(1, 'O título não pode ser vazio'),
@@ -62,18 +63,30 @@ export function CriarAnuncio(){
             return;
         }
 
-        console.log('Payload enviado:', data);
-
         try {
+            console.log('Imagem:' + data.imageArchive)
             await api.post('announcement/create', data, {
                 headers: {
                     Authorization: `Bearer ${accessToken}`
                 }
             });
 
+            alert("Anúncio salvo com sucesso");
+            navigate(pathHome);
+            
+            setTitle('');
+            setContent('');
+            setCity('');
+            setCategories([]);
+            setImageArchive('');
+            setPrice('');
+        } catch (error) {
+            alert("Erro ao criar anúncio");
+        }
+    }
+
     return (
         <div className="flex flex-col bg-slate-100 items-center justify-center">
-            <Header/>
             <main className="w-full max-w-3xl flex flex-col p-8 rounded-lg bg-white shadow-2x mb-20">
                 <div className="flex flex-col items-center mb-6">
                     <PhotoUpload

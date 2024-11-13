@@ -1,5 +1,5 @@
 import { useState } from 'react';
-import { storage } from '../../firebaseConfig';
+import { storage } from '../../services/firebaseConfig';
 import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
 import { v4 } from 'uuid';
 
@@ -32,7 +32,7 @@ function PhotoUpload({ nomeArquivo, onUploadComplete }) {
             () => {
                 getDownloadURL(uploadTask.snapshot.ref).then((url) => {
                     setDownloadURL(url);
-                    onUploadComplete(url);
+                    onUploadComplete(nomeArquivo);
                 });
             }
         );
