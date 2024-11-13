@@ -71,6 +71,20 @@ export function CriarAnuncio(){
                 }
             });
 
+            alert("Anúncio salvo com sucesso");
+            navigate('/home');
+            
+            setTitle('');
+            setContent('');
+            setCity('');
+            setCategories([]);
+            setImageArchive('');
+            setPrice('');
+        } catch (error) {
+            alert("Erro ao criar anúncio");
+        }
+    }
+
     return (
         <div className="flex flex-col bg-slate-100 items-center justify-center">
             <Header/>

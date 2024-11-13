@@ -1,9 +1,34 @@
-import './styles/index.css'
-import AppRoutes from "./routers/AppRoutes.tsx";
+import { createBrowserRouter } from 'react-router-dom';
 
+import { Login } from './pages/login'
+import { Home } from './pages/home'
+import { CriarAnuncio } from "./pages/anuncio/criar";
+import PrivateRoute from './components/PrivateRoute/PrivateRoute';
 
-function App() {
-  return <AppRoutes/>
-}
+import './index.css'
 
-export default App;
+const router = createBrowserRouter([
+  {
+    path: '/',
+    element: <Login/>
+  },
+  {
+    path: '/home',
+    element: (
+      <PrivateRoute>
+          <Home />
+      </PrivateRoute>
+    ),
+  },
+  {
+    path: '/anuncio/criar',
+    element: (
+      <PrivateRoute>
+          <CriarAnuncio/>
+      </PrivateRoute>
+    ),
+  }
+
+])
+
+export { router };
