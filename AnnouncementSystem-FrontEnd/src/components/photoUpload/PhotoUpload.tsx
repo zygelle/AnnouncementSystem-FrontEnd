@@ -18,10 +18,7 @@ function PhotoUpload({ nomeArquivo, onUploadComplete }) {
         if (!image) return;
 
         const storageRef = ref(storage, `${nomeArquivo}/${image.name + v4()}`);
-        console.log("Nome do arquivo: " + nomeArquivo)
         const uploadTask = uploadBytesResumable(storageRef, image);
-        console.log("Resposata do firebase: ")
-        console.log(uploadTask)
 
         uploadTask.on(
             "state_changed",

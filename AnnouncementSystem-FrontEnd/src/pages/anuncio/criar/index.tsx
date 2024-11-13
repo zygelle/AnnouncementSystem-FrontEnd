@@ -10,6 +10,7 @@ import { z } from 'zod';
 import { v4 } from 'uuid';
 import { pathHome } from "../../../routers/Paths";
 
+
 const anuncioSchema = z.object({
     title: z.string().min(1, 'O título não pode ser vazio'),
     content: z.string().min(1, 'A descrição não pode ser vazia'),
@@ -38,7 +39,6 @@ export function CriarAnuncio(){
     };
 
     const handleUploadComplete = (url) => {
-        console.log("Essa é a url: " + url)
         setImageArchive(url);
     };
 
@@ -62,8 +62,6 @@ export function CriarAnuncio(){
             setErrors(errorMessages);
             return;
         }
-
-        console.log('Payload enviado:', data);
 
         try {
             console.log('Imagem:' + data.imageArchive)
