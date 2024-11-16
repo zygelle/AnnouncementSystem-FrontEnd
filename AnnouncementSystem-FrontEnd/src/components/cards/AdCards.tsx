@@ -1,6 +1,6 @@
 import {Ad} from "../../schema/AdSchema.tsx";
 import {useNavigate} from "react-router-dom";
-import React, {useEffect, useState} from "react";
+import React, {useEffect, useLayoutEffect, useState} from "react";
 import {setPathVisualizarAnuncio} from "../../routers/Paths.tsx";
 import {getDownloadURL, listAll, ref} from "firebase/storage";
 import {storage} from "../../services/firebaseConfig.tsx";
@@ -22,27 +22,29 @@ const AdCardsOptional: React.FC<OptionAdCardsProps> = ({ ad }) => {
         return new Date(date).toLocaleDateString('pt-BR', options);
     };
     const [imageSrc, setImageSrc] = useState('/images/img-padrao.PNG');
-    const [imageList, setImageList] = useState<string[]>([]);
     const naviagte = useNavigate();
 
-    const fetchImages = (id: string) => {
-        const imageListRef = ref(storage, `${id}/`)
-        listAll(imageListRef).then((response) => {
-            response.items.forEach((item) => {
-                getDownloadURL(item).then((url) => {
-                    setImageList((prevState) => [...prevState, url]);
-                })
-            })
-        })
-        if (imageList.length > 0) {
-            const randomIndex = Math.floor(Math.random() * imageSrc.length);
-            setImageSrc(imageSrc[randomIndex]);
-        }
-    }
-
     useEffect(() => {
-        if (ad.imageArchive != null) fetchImages(ad.imageArchive);
+        fetchImages(ad.imageArchive)
     }, []);
+
+    const fetchImages = (id: string | null | undefined) => {
+        if (!ad.imageArchive) {
+            return;
+        }
+        const imageListRef = ref(storage, `${id}/`);
+        listAll(imageListRef).then((response) => {
+            if (response.items.length > 0) {
+                getDownloadURL(response.items[0]).then((url) => {
+                    setImageSrc(url);
+                });
+            } else {
+                console.log("Nenhuma imagem encontrada.");
+            }
+        }).catch(error => {
+            console.error("Erro ao buscar as imagens:", error);
+        });
+    };
 
     function handleNavigate(){
         naviagte(setPathVisualizarAnuncio(ad.id))
