@@ -7,7 +7,11 @@ import AdCardsOptional from "../../components/cards/AdCards.tsx";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter, faBroom } from '@fortawesome/free-solid-svg-icons';
 
-function Anuncios() {
+interface AnunciosProps {
+    initialFilter?: FilterRequest;
+}
+
+const Anuncios: React.FC<AnunciosProps> = ({ initialFilter }) => {
 
     const [ads, setAds] = useState<Ad[]>([]);
     const [page, setPage] = useState<number>(0);
@@ -20,6 +24,7 @@ function Anuncios() {
         minPrice: null,
         maxPrice: null,
         userType: null,
+        ...initialFilter,
     });
     const [isFilter, setIsFilter] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(false);
@@ -56,6 +61,12 @@ function Anuncios() {
     useEffect(() => {
         fetchAds()
     }, [page, filter]);
+
+    useEffect(() => {
+        if (initialFilter) {
+            setIsFilter(true);
+        }
+    }, [initialFilter]);
 
 
     const openOffcanvas = () => setIsOffcanvasOpen(true);
