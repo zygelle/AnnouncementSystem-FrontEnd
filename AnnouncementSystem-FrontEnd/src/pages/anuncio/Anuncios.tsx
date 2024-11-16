@@ -135,6 +135,7 @@ const Anuncios: React.FC<AnunciosProps> = ({ initialFilter }) => {
                     isOpen={isOffcanvasOpen}
                     onApplyFilters={handleFilterChange}
                     onClose={closeOffcanvas}
+                    currentFilters={filter}
                 />
             )}
 

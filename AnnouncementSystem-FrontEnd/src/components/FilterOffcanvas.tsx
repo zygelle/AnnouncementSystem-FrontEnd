@@ -7,16 +7,16 @@ import Select from "react-select";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
 
-
 interface FilterOffcanvasProps {
     onApplyFilters: (filter: FilterRequest) => void;
     onClose: () => void;
     isOpen: boolean;
+    currentFilters: FilterRequest;
 }
 
-const FilterOffcanvas: React.FC<FilterOffcanvasProps> = ({ onApplyFilters, onClose, isOpen}) => {
+const FilterOffcanvas: React.FC<FilterOffcanvasProps> = ({ onApplyFilters, onClose, isOpen, currentFilters}) => {
 
-    const { register, handleSubmit, formState: { errors }, setValue } = useForm<FilterRequest>({
+    const { register, handleSubmit, formState: { errors }, setValue,  watch} = useForm<FilterRequest>({
         resolver: zodResolver(FilterRequestSchema),
         defaultValues: {
             title: "",
@@ -28,6 +28,19 @@ const FilterOffcanvas: React.FC<FilterOffcanvasProps> = ({ onApplyFilters, onClo
             userType: null,
         }
     });
+
+    useEffect(() => {
+        if (isOpen && currentFilters) {
+            setValue("title", currentFilters.title);
+            setValue("content", currentFilters.content);
+            setValue("cities", currentFilters.cities);
+            setValue("categories", currentFilters.categories);
+            setValue("minPrice", currentFilters.minPrice);
+            setValue("maxPrice", currentFilters.maxPrice);
+            setValue("userType", currentFilters.userType);
+        }
+    }, [isOpen, currentFilters, setValue]);
+
 
     const typeUserOptions = [
         { value: "STUDENT", label: "Aluno(a)" },
@@ -137,8 +150,11 @@ const FilterOffcanvas: React.FC<FilterOffcanvasProps> = ({ onApplyFilters, onClo
                         {...register("cities")}
                         options={citySelectOptions}
                         isMulti
+                        value={citySelectOptions.filter(option =>
+                            watch("cities")?.includes(option.value)
+                        )}
                         onChange={(selectedOptions) => {
-                            const selectedValues = selectedOptions.map(option => option.label);
+                            const selectedValues = selectedOptions.map(option => option.value);
                             setValue("cities", selectedValues);
                         }}
                         className="input"
@@ -154,8 +170,11 @@ const FilterOffcanvas: React.FC<FilterOffcanvasProps> = ({ onApplyFilters, onClo
                         {...register("categories")}
                         options={categorySelectOptions}
                         isMulti
+                        value={categorySelectOptions.filter(option =>
+                            watch("categories")?.includes(option.value)
+                        )}
                         onChange={(selectedOptions) => {
-                            const selectedValues = selectedOptions.map(option => option.label);
+                            const selectedValues = selectedOptions.map(option => option.value);
                             setValue("categories", selectedValues);
                         }}
                         className="input"
@@ -210,6 +229,9 @@ const FilterOffcanvas: React.FC<FilterOffcanvasProps> = ({ onApplyFilters, onClo
                     <Select
                         {...register("userType")}
                         options={typeUserOptions}
+                        value={typeUserOptions.filter(option =>
+                            watch("userType")?.includes(option.value)
+                        )}
                         onChange={(selectedOption) => {
                             setValue('userType', selectedOption ? selectedOption.value : null); // Atualiza o valor do tipo de usuário
                         }}
