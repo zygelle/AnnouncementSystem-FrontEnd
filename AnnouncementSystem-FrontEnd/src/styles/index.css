@@ -24,7 +24,7 @@ main {
     box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
     border-radius: 15px;
     padding: 2rem;
-    width: 90%;
+    width: 100%;
     max-width: 1200px;
     margin: 0 auto;
 
@@ -34,7 +34,7 @@ main {
 
 @media (min-width: 1024px) {
     main {
-        width: 60%;
+        width: 70%;
     }
 }
 
