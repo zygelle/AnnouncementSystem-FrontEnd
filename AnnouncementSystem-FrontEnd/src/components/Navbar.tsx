@@ -41,7 +41,7 @@ function Navbar() {
 
     const navigationItems = [
         { label: 'Criar anúncio', path: pathCreateAds },
-        { label: 'Buscar anúncio', path: pathFilterAd },
+        { label: 'Anúncios', path: pathFilterAd },
         { label: 'Comunicação', path: pathCommunication },
         { label: 'Perfil', path: pathPerfil },
         { label: 'Meus anúncios', path: pathMeusAnuncios },

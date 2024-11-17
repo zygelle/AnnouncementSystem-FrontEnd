@@ -12,7 +12,7 @@ const Pagination: React.FC<PaginationProps> = ({ page, totalPages, setPage }) =>
                     onClick={() => setPage(page - 1)}
                     className="btn-primary"
                 >
-                    &lt; Anterior
+                    Anterior
                 </button>
             )}
             {Array.from({ length: totalPages }, (_, index) => (
@@ -29,7 +29,7 @@ const Pagination: React.FC<PaginationProps> = ({ page, totalPages, setPage }) =>
                     onClick={() => setPage(page + 1)}
                     className="btn-primary"
                 >
-                    Próximo &gt;
+                    Próximo
                 </button>
             )}
         </div>

@@ -9,3 +9,7 @@ export const pathVisualizarAnuncio = `/anunico/:id`
 export const setPathVisualizarAnuncio = (id: string) => {
     return `/anunico/${id}`
 }
+export const pathVizualizarAnunciante = '/anunciante/:name'
+export const setPathVizualizarAnunciante = (name: string) => {
+    return `/anunciante/${name}`
+}
