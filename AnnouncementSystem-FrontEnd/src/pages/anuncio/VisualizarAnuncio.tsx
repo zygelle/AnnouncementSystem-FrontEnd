@@ -1,11 +1,12 @@
-import {useParams} from "react-router-dom";
+import {useNavigate, useParams} from "react-router-dom";
 import {useEffect, useState} from "react";
-import {Ad, AdSchema} from "../../schema/AdSchema.tsx";
+import {Ad, AdSchema, FilterRequest} from "../../schema/AdSchema.tsx";
 import api from "../../services/api.tsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faStarHalfStroke, faTag} from "@fortawesome/free-solid-svg-icons";
 import {getDownloadURL, listAll, ref} from "firebase/storage";
 import {storage} from "../../services/firebaseConfig.tsx";
+import {pathFilterAd, setPathVizualizarAnunciante} from "../../routers/Paths.tsx";
 
 function VisualizarAnuncio() {
 
@@ -15,6 +16,7 @@ function VisualizarAnuncio() {
     const [imgPerfil, setImgPerfil] = useState<string>('/images/img-padrao.PNG');
     const [images, setImagens] = useState<string[]>([]);
     const defaultImage = "/images/img-padrao.PNG";
+    const navigate = useNavigate();
     const [selectedImage, setSelectedImage] = useState<string>(defaultImage);
     const [currentIndex, setCurrentIndex] = useState(0);
 
@@ -28,6 +30,31 @@ function VisualizarAnuncio() {
             setCurrentIndex(currentIndex + 1);
         }
     };
+    function handleAuthor(){
+        if(ad && ad.author && ad.author){
+            navigate(setPathVizualizarAnunciante(ad.author.name), {
+                state: { email: ad.author.email }
+            });
+        }
+        else console.log("Erro ao acessar o página do anunciante.")
+    }
+    function handleCategoria(id: string) {
+        const filterRequest: FilterRequest = {
+            title: "",
+            content: "",
+            cities: null,
+            categories: [id],
+            minPrice: null,
+            maxPrice: null,
+            userType: null,
+        };
+
+        console.log(filterRequest)
+
+        navigate(pathFilterAd, {
+            state: filterRequest,
+        });
+    }
 
     const visibleImages = images.slice(currentIndex, currentIndex + 3);
 
@@ -122,7 +149,7 @@ function VisualizarAnuncio() {
                     <div>{ad.city.name}</div>
                     <div className="text-end">{formatDate(ad.date)}</div>
                 </div>
-                <div className="flex flex-col items-center md:order-1 md:row-span-6">
+                <div className="flex flex-col items-center md:order-1 md:row-span-5">
                     <div className="mb-4">
                         <img
                             src={selectedImage}
@@ -178,45 +205,55 @@ function VisualizarAnuncio() {
                 <div className="md:order-2">
                     {ad.content}
                 </div>
-                <div className="flex justify-between md:order-2">
-                    <div className="text-lg font-medium content-center">{
-                        ad.price != null && ad.price > 0 &&
-                        (<span>R$ {ad.price.toLocaleString('pt-BR', {
-                            minimumFractionDigits: 2,
-                            maximumFractionDigits: 2
-                        })}</span>)
-                    }</div>
-                    <div className="flex justify-center align-middle">
-                        <div className="w-16 h-16 justify-center">
-                            <img
-                                src={imgPerfil}
-                                alt="Imagem de Perfil"
-                                className="rounded-full"
-                            />
-                        </div>
-                        <div className="flex flex-col justify-center p-1">
-                            <div className="">{ad.author.name}</div>
-                            <div>
-                                <FontAwesomeIcon icon={faStarHalfStroke} className="me-1 text-yellow-400"/>
-                                {formatScore(ad.author.score)}
+                <div className="grid grid-cols-2 gap-2 justify-between md:order-2">
+                    <div className="text-lg font-medium content-center">
+                        {
+                            ad.price != null && ad.price > 0 &&
+                            (<span>R$ {ad.price.toLocaleString('pt-BR', {
+                                minimumFractionDigits: 2,
+                                maximumFractionDigits: 2
+                            })}</span>)
+                        }
+                    </div>
+                    <div className="flex justify-end">
+                        <div
+                            className="flex items-center w-fit justify-center align-middle border-2 px-4 py-1 bg-gray-100 rounded-xl hover:cursor-pointer hover:bg-gray-300"
+                            onClick={handleAuthor}>
+                            <div className="w-10 h-10 justify-center">
+                                <img
+                                    src={imgPerfil}
+                                    alt="Imagem de Perfil"
+                                    className="rounded-full"
+                                />
+                            </div>
+                            <div className="flex flex-col justify-center p-1">
+                                <div className="text-xs">
+                                    {ad.author.name.split(" ")[0]} {ad.author.name.split(" ").slice(-1)[0]}
+                                </div>
+                                <div className="text-xs">
+                                    <FontAwesomeIcon icon={faStarHalfStroke} className="me-1 text-yellow-400"/>
+                                    {formatScore(ad.author.score)}
+                                </div>
                             </div>
                         </div>
                     </div>
+                    <div className="flex justify-end mx-8 col-start-2 col-end-2">
+                        <button className="bg-blue-500 px-4 py-1 rounded-xl text-white
+                                            hover:bg-blue-800
+                        ">
+                            Contatar
+                        </button>
+                    </div>
                 </div>
-                <div className="flex justify-between items-center md:order-2">
+                <div className="flex md:justify-end md:order-2 md:col-span-2">
                     <div className="flex items-center text-xs">
                         {ad.categories.map((category, index) => (
-                            <div key={index} className="">
-                                <span className="inline-block bg-blue-200 text-blue-800 px-3 py-1 me-1 rounded-full">
+                            <div key={index} onClick={() => handleCategoria(category.id)}>
+                                <span className="inline-block bg-blue-200 text-blue-800 px-3 py-1 me-1 rounded-full hover:cursor-pointer hover:bg-blue-400 hover:text-white">
                                   <FontAwesomeIcon icon={faTag}/> {category?.name}
                                 </span>
                             </div>
                         ))}
-                    </div>
-                    <div>
-                        <button className="btn-primary">
-                            Contatar
-                        </button>
                     </div>
                 </div>
             </div>
