@@ -3,6 +3,7 @@ import { Input } from '../../components/forms/Input';
 import { useState } from "react";
 
 import api from "../../services/api";
+import {pathHome} from "../../routers/Paths.tsx";
 
 export function Login() {
     const [email, setEmail] = useState('');
@@ -25,11 +26,12 @@ export function Login() {
             localStorage.setItem('email', email);
             localStorage.setItem('accessToken', response.data.token);
 
-            navigate('/home');
+            navigate(pathHome);
         } catch (error) {
             setErrorMessage('Falha no login, tente novamente');
         }
     }
+
 
     return(
         <div className="flex w-full h-screen items-center justify-center flex-col bg-gray-400">
