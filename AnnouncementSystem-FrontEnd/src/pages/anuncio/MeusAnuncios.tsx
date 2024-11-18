@@ -1,12 +1,18 @@
-import {Ad} from "../../schema/AdSchema.tsx";
+import {Ad, PaginatedAdsSchema} from "../../schema/AdSchema.tsx";
 import {useEffect, useState} from "react";
 import api from "../../services/api.tsx";
 import AdCardsOptional from "../../components/cards/AdCards.tsx";
+import Pagination from "../../components/Pagination.tsx";
 
 const MeusAnuncios: React.FC = () => {
     const [openAds, setOpenAds] = useState<Ad[]>([]);
     const [closedAds, setClosedAds] = useState<Ad[]>([]);
     const [suspendedAds, setSuspendedAds] = useState<Ad[]>([]);
+    const [openAdsCount, setOpenAdsCount] = useState<number>(0);
+    const [closedAdsCount, setClosedAdsCount] = useState<number>(0);
+    const [suspendedAdsCount, setSuspendedAdsCount] = useState<number>(0);
+    const [page, setPage] = useState<number>(0);
+    const [totalPages, setTotalPages] = useState<number>(0);
     const [currentTab, setCurrentTab] = useState("open");
     const [loading, setLoading] = useState<boolean>(false);
 
@@ -14,21 +20,30 @@ const MeusAnuncios: React.FC = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('accessToken');
-            const response = await api.get(`/announcement/${status}`, {
+            const response = await api.get(`/announcement/${status}?page=${page}&size=5`, {
                 headers: {
                     Authorization: `Bearer ${token}`,
                 },
             });
-
-            const ads = response.data.content || []; 
-    
+            console.log("Dados recebidos da API:", response.data.totalElements);
+            const parsed = PaginatedAdsSchema.safeParse(response.data);
+        if (parsed.success) {
             if (status === "open") {
-                setOpenAds(ads);
-            } else if (status === "closed") {
-                setClosedAds(ads);
-            } else if (status === "suspended") {
-                setSuspendedAds(ads);
+                setOpenAds(parsed.data.content);
+                setOpenAdsCount(parsed.data.totalElements);
             }
+            if (status === "closed") {
+                setClosedAds(parsed.data.content);
+                setClosedAdsCount(parsed.data.totalElements);
+            }
+            if (status === "suspended") {
+                setSuspendedAds(parsed.data.content);
+                setSuspendedAdsCount(parsed.data.totalElements);
+            }
+            setTotalPages(parsed.data.totalPages);
+        } else {
+            console.error("Erro ao validar resposta do servidor:", parsed.error);
+        }
         } catch (error) {
             console.error(`Erro ao buscar anúncios ${status}:`, error);
         } finally {
@@ -37,8 +52,9 @@ const MeusAnuncios: React.FC = () => {
     };
 
     useEffect(() => {
+        console.log("Fetching ads with", { currentTab, page });
         fetchAds(currentTab);
-    }, [currentTab]);
+    }, [currentTab, page]);
 
     return (
         <main>
@@ -52,9 +68,12 @@ const MeusAnuncios: React.FC = () => {
                                     ? "text-blue-600 border-b-2 border-blue-600 dark:text-blue-500 dark:border-blue-500"
                                     : "border-transparent hover:text-gray-600 hover:border-gray-300"
                             }`}
-                            onClick={() => setCurrentTab("open")}
+                            onClick={() => { 
+                                setCurrentTab("open");
+                                setPage(0);
+                            }}
                         >
-                            Ativos <span>({openAds.length})</span>
+                            Ativos <span>({openAdsCount})</span>
                         </button>
                     </li>
                     <li className="me-2">
@@ -64,9 +83,12 @@ const MeusAnuncios: React.FC = () => {
                                     ? "text-blue-600 border-b-2 border-blue-600 dark:text-blue-500 dark:border-blue-500"
                                     : "border-transparent hover:text-gray-600 hover:border-gray-300"
                             }`}
-                            onClick={() => setCurrentTab("closed")}
+                            onClick={() => { 
+                                setCurrentTab("closed");
+                                setPage(0);
+                            }}
                         >
-                            Finalizados <span>({closedAds.length})</span>
+                            Finalizados <span>({closedAdsCount})</span>
                         </button>
                     </li>
                     <li className="me-2">
@@ -76,9 +98,12 @@ const MeusAnuncios: React.FC = () => {
                                     ? "text-blue-600 border-b-2 border-blue-600 dark:text-blue-500 dark:border-blue-500"
                                     : "border-transparent hover:text-gray-600 hover:border-gray-300"
                             }`}
-                            onClick={() => setCurrentTab("suspended")}
+                            onClick={() => { 
+                                setCurrentTab("suspended");
+                                setPage(0);
+                            }}
                         >
-                            Suspensos <span>({suspendedAds.length})</span>
+                            Suspensos <span>({suspendedAdsCount})</span>
                         </button>
                     </li>
                 </ul>
@@ -117,6 +142,9 @@ const MeusAnuncios: React.FC = () => {
                         )
                     ))}
             </div>
+            {totalPages > 1 &&
+                <Pagination page={page} totalPages={totalPages} setPage={setPage}/>
+            }
         </main>
     );
 }
