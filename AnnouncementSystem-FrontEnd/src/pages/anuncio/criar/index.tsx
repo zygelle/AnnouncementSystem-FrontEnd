@@ -1,157 +1,205 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { Input } from '../../../components/forms/Input'
-import { Textarea } from '../../../components/forms/Textarea';
-import CreatableSelect from 'react-select/creatable';
 import PhotoUpload from '../../../components/photoUpload/PhotoUpload';
-
+import Select from "react-select";
+import {Category, CategorySchema, City, CitySchema } from "../../../schema/AdSchema";
 import api from '../../../services/api';
-import { z } from 'zod';
+import { zodResolver } from "@hookform/resolvers/zod";
 import { v4 } from 'uuid';
-import { pathHome } from "../../../routers/Paths";
-
-
-const anuncioSchema = z.object({
-    title: z.string().min(1, 'O título não pode ser vazio'),
-    content: z.string().min(1, 'A descrição não pode ser vazia'),
-    city: z.string().min(1, 'A cidade não pode ser vazia'),
-    categories: z.array(z.string()).min(1, 'Escolha ao menos uma categoria'),
-    paths: z.array(z.string()).optional(),
-    price: z.number().nonnegative('O preço não pode ser negativo'),
-});
+import { pathHome, setPathVisualizarAnuncio } from "../../../routers/Paths";
+import { AdSchema, createAd, createAdSchema } from "../../../schema/AdSchema";
+import { useForm } from "react-hook-form";
+import { storage } from '../../../services/firebaseConfig';
+import { ref, uploadBytesResumable } from "firebase/storage";
 
 export function CriarAnuncio(){
-    const [title, setTitle] = useState('');
-    const [content, setContent] = useState('');
-    const [city, setCity] = useState('');
-    const [categories, setCategories] = useState([]);
-    const [imageArchive, setImageArchive] = useState('');
-    const [price, setPrice] = useState('');
-    const [errors, setErrors] = useState({});
-    const navigate = useNavigate();
-    const accessToken = localStorage.getItem('accessToken');
-
+    const [image, setImage] = useState<File|null>(null);
+    const [isImage, setIsImage] = useState<boolean>(false);
     const [nomeArquivo, setNomeArquivo] = useState<string>('');
-    useEffect(() => { setNomeArquivo(v4().toString()) }, []);
+    const navigate = useNavigate();
+    const [cityOptions, setCityOptions] = useState<City[]>([]);
+    const [categoryOptions, setCategoryOptions] = useState<Category[]>([]);
+    const categorySelectOptions = categoryOptions.map(category => ({
+            value: category.id,
+            label: category.name
+        }));
+    const citySelectOptions = cityOptions.map(city => ({
+            value: city.id,
+            label: city.name
+        }));
 
-    const handleChangeCategories = (selectedOptions) => {
-        setCategories(selectedOptions || []);
-    };
+    useEffect(() => {
+            fetchCities()
+            fetchCategory()
+            setNomeArquivo(v4().toString())
+        }, []);
 
-    const handleUploadComplete = (url) => {
-        setImageArchive(url);
-    };
+    const { register, handleSubmit, formState: { errors }, setValue } = useForm<createAd>({
+        resolver: zodResolver(createAdSchema),
+        defaultValues: {
+            title: "",
+            content: "",
+            price: 0,
+            city: "",
+            categories: [],
+            imageArchive: "",
+        },
+    });
 
-    async function criar(e) {
-        e.preventDefault();
+    const fetchCategory = async () => {
+        try {
+            const response = await api.get("/category");
 
-        const categoriesValues = categories.map(option => option.value);
+            const categoriesData: Category[] = response.data;
 
-        const data = {
-            title,
-            content,
-            city,
-            categories: categoriesValues,
-            price: parseFloat(price),
-            imageArchive,
+            const categories = categoriesData.map((categories) => {
+                return CategorySchema.parse(categories);
+            });
+            setCategoryOptions(categories);
+        } catch (error) {
+            console.error("Erro ao carregar categorias:", error);
         }
+    };
 
-        const result = anuncioSchema.safeParse(data);
+    const fetchCities = async () => {
+        try {
+            const response = await api.get("/city");
+
+            const citiesData: City[] = response.data;
+
+            const cities = citiesData.map((city) => {
+                return CitySchema.parse(city);
+            });
+            setCityOptions(cities);
+        } catch (error) {
+            console.error("Erro ao carregar cidades:", error);
+        }
+    };
+
+    const handleUpload = (image: File) => {
+        const storageRef = ref(storage, `${nomeArquivo}/${image.name + v4()}`);
+        const uploadTask = uploadBytesResumable(storageRef, image);
+    
+        uploadTask.on(
+            "state_changed",
+            () => {
+            },
+            (error) => {
+                console.error("Erro ao fazer upload:", error);
+                return ('');
+            }
+        );
+        return nomeArquivo;
+    };
+    
+
+    async function saveDatabase(e:createAd) {
+        const result = createAdSchema.safeParse(e);
         if (!result.success) {
-            const errorMessages = result.error.format();
-            setErrors(errorMessages);
+            console.log(result.error);
             return;
         }
-
         try {
-            console.log('Imagem:' + data.imageArchive)
-            await api.post('announcement/create', data, {
-                headers: {
-                    Authorization: `Bearer ${accessToken}`
-                }
-            });
-
-            alert("Anúncio salvo com sucesso");
-            navigate(pathHome);
+            const response = await api.post('announcement/create', e);
+            const data = AdSchema.safeParse(response.data);
+            if(data.success) {
+                navigate(setPathVisualizarAnuncio(data.data.id));
+            } else {
+                console.log("Erro ao validar resposta do servidor.");
+                navigate(pathHome);
+            }
             
-            setTitle('');
-            setContent('');
-            setCity('');
-            setCategories([]);
-            setImageArchive('');
-            setPrice('');
         } catch (error) {
             alert("Erro ao criar anúncio");
         }
     }
+
+    async function criar(e: createAd) {
+        try {
+            if (isImage && image) {
+                const uploadURL = await handleUpload(image);
+                e.imageArchive = uploadURL;
+            }
+
+            saveDatabase(e);
+        } catch (error) {
+            console.error("Erro ao criar anúncio:", error);
+        }
+    }
+    
 
     return (
         <div className="flex flex-col bg-slate-100 items-center justify-center">
             <main className="w-full max-w-3xl flex flex-col p-8 rounded-lg bg-white shadow-2x mb-20">
                 <div className="flex flex-col items-center mb-6">
                     <PhotoUpload
-                        nomeArquivo={nomeArquivo}
-                        onUploadComplete={handleUploadComplete}
+                        Image={setImage}
+                        isImage={setIsImage}
                     />
                 </div>
                 <div className="gap-2.5 mt-5 max-w-full">
-                    <form onSubmit={criar} className="grid grid-cols-2 gap-6">
+                    <form onSubmit={handleSubmit(criar)} className="grid grid-cols-2 gap-6">
                         <div className="flex flex-col gap-4">
                             <div>
                                 <label className="mb-2">Título</label>
-                                <Input
-                                    className='w-full border border-slate-300 h-9 rounded-md outline-none px-2 mb-4'
-                                    placeholder='Título'
-                                    type="text"
-                                    value={title}
-                                    onChange={(e) => setTitle(e.target.value)}
+                                <input
+                                    {...register("title")}
+                                    className="w-full border border-slate-300 h-9 rounded-md outline-none px-2 mb-4"
+                                    placeholder="Título"
                                 />
-                                {errors.title && <span className='text-red-600'>{errors.title._errors}</span>}
+                                {errors.title && <span className="text-red-600">{errors.title.message}</span>}
+
                             </div>
                             <div>
                                 <label className="mb-2">Descrição do Anúncio</label>
-                                <Textarea 
-                                    rows="4"
-                                    value={content}
-                                    onChange={(e) => setContent(e.target.value)}
+                                <textarea
+                                    {...register("content")}
+                                    rows={4}
+                                    className="block p-2 w-full text-sm text-gray-900 rounded-lg border border-gray-300 focus:outline-slate-300"
                                 />
-                                {errors.content && <span className='text-red-600'>{errors.content._errors}</span>}
+                                {errors.content && <span className='text-red-600'>{errors.content.message}</span>}
                             </div>
                             <div>
                                 <label className="mb-2">Localização</label>
-                                <Input
-                                    className='w-full border border-slate-300 h-9 rounded-md outline-none px-2 mb-4'
-                                    placeholder='Cidade'
-                                    type="text"
-                                    value={city}
-                                    onChange={(e) => setCity(e.target.value)}
+                                <Select
+                                    {...register("city")}
+                                    options={citySelectOptions}
+                                    onChange={(selectedOption) => {
+                                        setValue("city", selectedOption ? selectedOption.value : '');
+                                    }}
+                                    className="input"
+                                    placeholder="Selecione a cidade"
                                 />
-                                {errors.city && <span className='text-red-600'>{errors.city._errors}</span>}
+                                {errors.city && <span className='text-red-600'>{errors.city.message}</span>}
                             </div>
                         </div>
                         <div className="flex flex-col gap-4">
                             <div>
                                 <label className="mb-2">Categorias</label>
-                                <CreatableSelect 
-                                    isClearable 
-                                    isMulti 
-                                    className="mb-2"
-                                    onChange={handleChangeCategories} 
-                                    placeholder="Categorias"
+                                <Select
+                                    {...register("categories")}
+                                    options={categorySelectOptions}
+                                    isMulti
+                                    onChange={(selectedOptions) => {
+                                        const selectedValues = selectedOptions ? selectedOptions.map(option => option.value) : [];
+                                        setValue("categories", selectedValues);
+                                    }}
+                                    className="input"
+                                    placeholder="Selecione as categorias"
                                 />
-                                {errors.categories && <span className='text-red-600'>{errors.categories._errors}</span>}
+                                {errors.categories && <span className='text-red-600'>{errors.categories.message}</span>}
                             </div>
                             <div>
                                 <label className="mb-2">Preço (R$)</label>
-                                <Input
+                                <input
+                                    {...register("price", { valueAsNumber: true })}
                                     className='w-full border border-slate-300 h-9 rounded-md outline-none px-2 mb-4'
                                     placeholder="0.0"
                                     step={.01}
+                                    defaultValue={0}
                                     type="number"
-                                    value={price}
-                                    onChange={(e) => setPrice(e.target.value)}
                                 />
-                                {errors.price && <span className='text-red-600'>{errors.price._errors}</span>}
+                                {errors.price && <span className='text-red-600'>{errors.price.message}</span>}
                             </div>
                         </div>
                         <div className="col-span-2 flex justify-center gap-4">
