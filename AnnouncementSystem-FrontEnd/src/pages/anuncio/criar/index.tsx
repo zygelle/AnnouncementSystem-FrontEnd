@@ -13,8 +13,8 @@ import { storage } from '../../../services/firebaseConfig';
 import { ref, uploadBytesResumable } from "firebase/storage";
 
 export function CriarAnuncio(){
-    const [image, setImage] = useState<File|null>(null);
-    const [isImage, setIsImage] = useState<boolean>(false);
+    const [images, setImages] = useState<File[]>([]);
+    const [isImages, setIsImages] = useState<boolean>(false);
     const [nomeArquivo, setNomeArquivo] = useState<string>('');
     const navigate = useNavigate();
     const [cityOptions, setCityOptions] = useState<City[]>([]);
@@ -76,22 +76,41 @@ export function CriarAnuncio(){
         }
     };
 
-    const handleUpload = (image: File) => {
-        const storageRef = ref(storage, `${nomeArquivo}/${image.name + v4()}`);
-        const uploadTask = uploadBytesResumable(storageRef, image);
+    const handleUpload = async (images: File[]): Promise<string> => {
+        const uploadPromises = images.map((image) => {
+            const uniqueName = `${nomeArquivo}/${image.name}_${v4()}`;
+            const storageRef = ref(storage, uniqueName);
     
-        uploadTask.on(
-            "state_changed",
-            () => {
-            },
-            (error) => {
-                console.error("Erro ao fazer upload:", error);
-                return ('');
-            }
-        );
-        return nomeArquivo;
+            return new Promise<void>((resolve, reject) => {
+                const uploadTask = uploadBytesResumable(storageRef, image);
+    
+                uploadTask.on(
+                    "state_changed",
+                    (snapshot) => {
+                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
+                        console.log(`Upload de ${image.name}: ${progress.toFixed(2)}% concluído.`);
+                    },
+                    (error) => {
+                        console.error(`Erro ao fazer upload de ${image.name}:`, error);
+                        reject(error);
+                    },
+                    () => {
+                        console.log(`Upload de ${image.name} concluído.`);
+                        resolve();
+                    }
+                );
+            });
+        });
+
+        try {
+            await Promise.all(uploadPromises);
+            console.log("Todos os uploads foram concluídos com sucesso.");
+            return nomeArquivo;
+        } catch (error) {
+            console.error("Erro durante o upload de uma ou mais imagens:", error);
+            throw new Error("Erro durante o upload. Processo interrompido.");
+        }
     };
-    
 
     async function saveDatabase(e:createAd) {
         const result = createAdSchema.safeParse(e);
@@ -116,9 +135,9 @@ export function CriarAnuncio(){
 
     async function criar(e: createAd) {
         try {
-            if (isImage && image) {
-                const uploadURL = await handleUpload(image);
-                e.imageArchive = uploadURL;
+            if (isImages && images.length>0) {
+                const nome = await handleUpload(images);
+                e.imageArchive = nome;
             }
 
             saveDatabase(e);
@@ -126,15 +145,14 @@ export function CriarAnuncio(){
             console.error("Erro ao criar anúncio:", error);
         }
     }
-    
 
     return (
         <div className="flex flex-col bg-slate-100 items-center justify-center">
             <main className="w-full max-w-3xl flex flex-col p-8 rounded-lg bg-white shadow-2x mb-20">
                 <div className="flex flex-col items-center mb-6">
                     <PhotoUpload
-                        Image={setImage}
-                        isImage={setIsImage}
+                        Images={setImages}
+                        isImages={setIsImages}
                     />
                 </div>
                 <div className="gap-2.5 mt-5 max-w-full">
@@ -148,7 +166,6 @@ export function CriarAnuncio(){
                                     placeholder="Título"
                                 />
                                 {errors.title && <span className="text-red-600">{errors.title.message}</span>}
-
                             </div>
                             <div>
                                 <label className="mb-2">Descrição do Anúncio</label>
