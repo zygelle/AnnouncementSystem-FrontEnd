@@ -1,59 +1,84 @@
 import { useState } from 'react';
-import { storage } from '../../services/firebaseConfig';
-import { ref, uploadBytesResumable, getDownloadURL } from "firebase/storage";
-import { v4 } from 'uuid';
 
-function PhotoUpload({ nomeArquivo, onUploadComplete }) {
-    const [image, setImage] = useState<File|null>(null);
-    const [uploadProgress, setUploadProgress] = useState(0);
-    const [downloadURL, setDownloadURL] = useState("");
+interface photoUploadProps {
+    Images: (images: File[]) => void;
+    isImages: (isImages: boolean) => void;
+}
 
-    const handleFileChange = (e) => {
-        if (e.target.files && e.target.files[0]) {
-            setImage(e.target.files[0]);
+const PhotoUpload: React.FC<photoUploadProps> = ({ Images, isImages }) => {
+    const [selectedFiles, setSelectedFiles] = useState<File[]>([]);
+    const [currentIndex, setCurrentIndex] = useState(0);
+    const [selectedImage, setSelectedImage] = useState<string | null>(null);
+
+    const handleFileChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+        if (e.target.files) {
+            const newFiles = Array.from(e.target.files);
+            const updatedFiles = [...selectedFiles, ...newFiles];
+            setSelectedFiles(updatedFiles);
+            Images(updatedFiles);
+            isImages(updatedFiles.length > 0);
         }
     };
 
-    const handleUpload = () => {
-        if (!image) return;
-
-        const storageRef = ref(storage, `${nomeArquivo}/${image.name + v4()}`);
-        const uploadTask = uploadBytesResumable(storageRef, image);
-
-        uploadTask.on(
-            "state_changed",
-            (snapshot) => {
-                const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                setUploadProgress(progress);
-            },
-            (error) => {
-                console.error("Erro ao fazer upload:", error);
-            },
-            () => {
-                getDownloadURL(uploadTask.snapshot.ref).then((url) => {
-                    setDownloadURL(url);
-                    onUploadComplete(nomeArquivo);
-                });
-            }
-        );
+    const handlePrevious = () => {
+        if (currentIndex > 0) {
+            setCurrentIndex((prevIndex) => prevIndex - 1);
+        }
     };
 
+    const handleNext = () => {
+        if (currentIndex < selectedFiles.length - 3) {
+            setCurrentIndex((prevIndex) => prevIndex + 1);
+        }
+    };
+
+    const visibleImages = selectedFiles.slice(currentIndex, currentIndex + 3);
+
     return (
-        <div className='flex flex-col justify-center items-center'>
-            <h2 className='text-center text-lg mb-6'>Upload de Foto</h2>
-            <input type="file" onChange={handleFileChange} />
-            <button
-                className='w-40 h-9 bg-blue-900 hover:bg-blue-700 rounded border-0 text-lg text-white px-4 mt-8'
-                onClick={handleUpload}>Upload</button>
-            {uploadProgress > 0 && <p>Progresso: {uploadProgress.toFixed(2)}%</p>}
-            {downloadURL && (
-                <div>
-                    <p className='text-center m-3'>Upload concluído!</p>
-                    <img src={downloadURL} alt="Uploaded file" width="200px" />
+        <div className="flex flex-col justify-center items-center">
+            <h2 className="text-center text-lg mb-6">Upload de Foto</h2>
+            <input type="file" onChange={handleFileChange} multiple />
+
+            {selectedFiles.length > 0 && (
+                <div className="flex items-center space-x-2 mt-4">
+                    {currentIndex > 0 && (
+                        <button
+                            className="text-gray-700 hover:text-gray-900"
+                            onClick={handlePrevious}
+                        >
+                            {"<"}
+                        </button>
+                    )}
+
+                    <div className="flex space-x-3">
+                        {visibleImages.map((file, index) => {
+                            const fileUrl = URL.createObjectURL(file);
+                            return (
+                                <img
+                                    key={index}
+                                    src={fileUrl}
+                                    alt={`Imagem ${index + 1}`}
+                                    className={`w-20 h-20 object-cover rounded-md cursor-pointer ${
+                                        selectedImage === fileUrl ? "ring-2 ring-blue-500" : ""
+                                    }`}
+                                    onClick={() => setSelectedImage(fileUrl)}
+                                />
+                            );
+                        })}
+                    </div>
+
+                    {currentIndex < selectedFiles.length - 3 && (
+                        <button
+                            className="text-gray-700 hover:text-gray-900"
+                            onClick={handleNext}
+                        >
+                            {">"}
+                        </button>
+                    )}
                 </div>
             )}
         </div>
     );
-}
+};
 
 export default PhotoUpload;
