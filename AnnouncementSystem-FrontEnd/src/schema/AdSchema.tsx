@@ -30,7 +30,7 @@ export const AuthorSchema = z.object({
     email: z.string().email(),
     name: z.string(),
     icon: z.string().nullable().optional(),
-    score: z.number()
+    score: z.number().optional()
 });
 
 export const AdSchema = z.object({

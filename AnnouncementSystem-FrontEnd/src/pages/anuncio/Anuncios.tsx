@@ -1,21 +1,17 @@
 import {Ad, FilterRequest, FilterRequestSchema, PaginatedAdsSchema} from "../../schema/AdSchema.tsx";
-import {useEffect, useRef, useState} from "react";
+import {useEffect, useState} from "react";
 import api from "../../services/api.tsx";
 import FilterOffcanvas from "../../components/FilterOffcanvas.tsx";
 import Pagination from "../../components/Pagination.tsx";
 import AdCardsOptional from "../../components/cards/AdCards.tsx";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter, faBroom } from '@fortawesome/free-solid-svg-icons';
-import {useLocation} from "react-router-dom";
 
 interface AnunciosProps {
     initialFilter?: FilterRequest;
 }
 
-const Anuncios: React.FC<AnunciosProps> = () => {
-
-    const location = useLocation();
-    const initialFilter = location.state as FilterRequest | undefined;
+const Anuncios: React.FC<AnunciosProps> = ({ initialFilter }) => {
 
     const [ads, setAds] = useState<Ad[]>([]);
     const [page, setPage] = useState<number>(0);
@@ -32,13 +28,7 @@ const Anuncios: React.FC<AnunciosProps> = () => {
     });
     const [isFilter, setIsFilter] = useState<boolean>(false)
     const [loading, setLoading] = useState<boolean>(false);
-    const [isOffcanvasOpen, setIsOffcanvasOpen] = useState(false)
-    const topRef = useRef<HTMLDivElement>(null);
-
-    const handlePageChange = (newPage: number) => {
-        setPage(newPage);
-        topRef.current?.scrollIntoView({ behavior: 'smooth' });
-    };
+    const [isOffcanvasOpen, setIsOffcanvasOpen] = useState(false);
 
     const fetchAds = async () => {
         setLoading(true);
@@ -72,7 +62,6 @@ const Anuncios: React.FC<AnunciosProps> = () => {
         fetchAds()
     }, [page, filter]);
 
-
     useEffect(() => {
         if (initialFilter) {
             setIsFilter(true);
@@ -87,7 +76,7 @@ const Anuncios: React.FC<AnunciosProps> = () => {
         <main>
 
             <div className="flex justify-between mb-4">
-                <h1 ref={topRef} className="text-3xl font-semibold text-gray-900">Anúncios</h1>
+                <h1 className="text-3xl font-semibold text-gray-900">Anúncios</h1>
                 <div className="flex gap-2">
                     <button
                         onClick={openOffcanvas}
@@ -108,7 +97,7 @@ const Anuncios: React.FC<AnunciosProps> = () => {
                                     maxPrice: null,
                                     userType: null,
                                 });
-                                setIsFilter(false);
+                                setIsFilter(false); // Define `isFilter` para falso após a limpeza
                             }}
                             className="text-gray-600 hover:text-red-600 transition duration-200"
                             aria-label="Limpar Filtro"
@@ -138,7 +127,7 @@ const Anuncios: React.FC<AnunciosProps> = () => {
             </div>
 
             {totalPages > 1 &&
-                <Pagination page={page} totalPages={totalPages} setPage={handlePageChange}/>
+                <Pagination page={page} totalPages={totalPages} setPage={setPage}/>
             }
 
             {isOffcanvasOpen && (
