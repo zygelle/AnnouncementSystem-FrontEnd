@@ -22,7 +22,7 @@ const AdCardsOptional: React.FC<OptionAdCardsProps> = ({ ad }) => {
         return new Date(date).toLocaleDateString('pt-BR', options);
     };
     const [imageSrc, setImageSrc] = useState('/images/img-padrao.PNG');
-    const naviagte = useNavigate();
+    const navigate = useNavigate();
 
     useEffect(() => {
         fetchImages(ad.imageArchive)
@@ -47,7 +47,7 @@ const AdCardsOptional: React.FC<OptionAdCardsProps> = ({ ad }) => {
     };
 
     function handleNavigate(){
-        naviagte(setPathVisualizarAnuncio(ad.id))
+        navigate(setPathVisualizarAnuncio(ad.id))
     }
 
     return (
@@ -58,7 +58,7 @@ const AdCardsOptional: React.FC<OptionAdCardsProps> = ({ ad }) => {
                 <div>{ad.city.name}</div>
                 <div className="text-end text-sm">{formatDate(ad.date)}</div>
             </div>
-            <div className="justify-items-center content-center md:row-span-5 md:order-1">
+            <div className="justify-items-center content-center md:row-span-5 md:order-1 md:pe-1">
                 <div className="flex justify-center items-center overflow-hidden h-40 md:h-48 md:rounded-3xl lg:40">
                     <img
                         src={imageSrc}
