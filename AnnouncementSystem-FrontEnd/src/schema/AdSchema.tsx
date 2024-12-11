@@ -63,7 +63,7 @@ export const createAdSchema = z.object({
     content: z.string().min(1, { message: "Descrição é obrigatória" }),
     price: z.preprocess(
         (value) => parseFloat(String(value)),
-        z.number().positive({ message: "O preço deve ser positivo" })
+        z.number().nonnegative({ message: "O preço deve ser não negativo" })
     ),
     city: z.string().min(1, { message: "Cidade é obrigatória" }),
     categories: z.array(z.string()).min(1, { message: "Selecione pelo menos uma categoria" }),
