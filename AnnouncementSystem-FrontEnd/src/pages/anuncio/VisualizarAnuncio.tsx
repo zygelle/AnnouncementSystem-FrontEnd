@@ -3,10 +3,11 @@ import {useEffect, useState} from "react";
 import {Ad, AdSchema, FilterRequest} from "../../schema/AdSchema.tsx";
 import api from "../../services/api.tsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faStarHalfStroke, faTag} from "@fortawesome/free-solid-svg-icons";
+import {faStarHalfStroke, faTag, faEdit} from "@fortawesome/free-solid-svg-icons";
 import {getDownloadURL, listAll, ref} from "firebase/storage";
 import {storage} from "../../services/firebaseConfig.tsx";
 import {pathFilterAd, setPathVizualizarAnunciante} from "../../routers/Paths.tsx";
+import { getEmail } from "../../services/token.tsx";
 
 function VisualizarAnuncio() {
 
@@ -16,9 +17,10 @@ function VisualizarAnuncio() {
     const [imgPerfil, setImgPerfil] = useState<string>('/images/img-padrao.PNG');
     const [images, setImagens] = useState<string[]>([]);
     const defaultImage = "/images/img-padrao.PNG";
-    const navigate = useNavigate();
     const [selectedImage, setSelectedImage] = useState<string>(defaultImage);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const navigate = useNavigate();
+    const userEmail = getEmail();
 
     const handlePrevious = () => {
         if (currentIndex > 0) {
@@ -37,6 +39,13 @@ function VisualizarAnuncio() {
             });
         }
         else console.log("Erro ao acessar o página do anunciante.")
+    }
+    function handleEdit() {
+        if (ad && ad.author.email === userEmail) {
+            navigate(`/anuncio/editar/${ad.id}`);
+        } else {
+            console.log("Você não pode editar este anúncio.");
+        }
     }
     function handleCategoria(id: string) {
         const filterRequest: FilterRequest = {
@@ -245,12 +254,21 @@ function VisualizarAnuncio() {
                         </button>
                     </div>
                 </div>
-                <div className="flex md:justify-end md:order-2 md:col-span-2">
+                <div className="flex md:justify-between md:order-2 md:col-span-2">
+                    {ad.author.email === userEmail && (
+                        <button
+                            className="bottom-4 left-4 bg-green-500 text-white px-4 py-1 rounded-xl hover:bg-green-700"
+                            onClick={handleEdit}
+                        >
+                            <FontAwesomeIcon icon={faEdit} className="me-2" />
+                            Editar
+                        </button>
+                    )}
                     <div className="flex items-center text-xs">
                         {ad.categories.map((category, index) => (
                             <div key={index} onClick={() => handleCategoria(category.id)}>
                                 <span className="inline-block bg-blue-200 text-blue-800 px-3 py-1 me-1 rounded-full hover:cursor-pointer hover:bg-blue-400 hover:text-white">
-                                  <FontAwesomeIcon icon={faTag}/> {category?.name}
+                                    <FontAwesomeIcon icon={faTag}/> {category?.name}
                                 </span>
                             </div>
                         ))}
