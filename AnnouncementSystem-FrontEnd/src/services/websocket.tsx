@@ -11,15 +11,13 @@ export const connectWebSocket = (token: string | null, onMessageReceived: (messa
     if (token){
         console.log("Token: " + token)
         stompClient = new Client({
-            brokerURL: 'ws://localhost:8080/ws/chat', // URL do endpoint WebSocket
-            connectHeaders: {
-                Authorization: `Bearer ${token}`, // Enviar token no cabeçalho
-            },
+            brokerURL: `ws://localhost:8080/ws/chat?token=${token}`, // URL do endpoint WebSocket
             onConnect: () => {
                 console.log('Conectado ao WebSocket');
 
                 // Inscrevendo-se para receber mensagens no destino "/queue/messages"
                 stompClient?.subscribe('/user/queue/messages', (message: IMessage) => {
+                    console.log('Mensagem recebida do WebSocket:', message.body);
                     if (message.body) {
                         onMessageReceived(JSON.parse(message.body));
                     }
@@ -32,6 +30,7 @@ export const connectWebSocket = (token: string | null, onMessageReceived: (messa
         });
 
         stompClient.activate();
+
     }else{
         console.log("Token Null")
     }
