@@ -2,12 +2,14 @@ import api from "../../services/api.tsx";
 import {useEffect, useState} from "react";
 import {Chat, PaginatedChatSchema} from "../../schema/ChatSchema.tsx";
 import ChatCards from "../../components/cards/ChatCards.tsx";
+import TalkCards from "../../components/cards/TalkCards.tsx";
 
 function Communication() {
 
     const [page, setPage] = useState<number>(0);
     const [totalPages, setTotalPages] = useState<number>(0);
     const [chats, setChats] = useState<Chat[]>([])
+    const [selectChat, setSelectChat] = useState<Chat>();
 
     const fetchChats = async () => {
         try {
@@ -39,12 +41,16 @@ function Communication() {
                 <div>
                     {chats.length > 0 &&
                         chats.map((chat) =>
-                            <ChatCards key={chat.id} chat={chat}/>
+                            <ChatCards key={chat.id} chat={chat} setSelectChat={setSelectChat}/>
                         )
                     }
                 </div>
                 <div>
-                    Chat
+                    {selectChat ? (
+                        <TalkCards chat={selectChat}/>
+                    ) : (
+                        <div>Sem Chat</div>
+                    )}
                 </div>
             </div>
         </main>
