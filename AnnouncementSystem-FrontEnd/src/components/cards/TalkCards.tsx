@@ -117,9 +117,8 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat }) => {
     };
 
     const handleEndChat = () => {
-        // Lógica para encerrar o chat. Isso pode envolver uma chamada de API para fechar o chat, etc.
         console.log("Chat encerrado");
-        setMenuVisible(false); // Esconde o menu após clicar em "Encerrar Chat"
+        setMenuVisible(false);
     };
 
     return (
@@ -143,16 +142,16 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat }) => {
                     <FontAwesomeIcon
                         icon={faEllipsisVertical}
                         className="w-6 h-6 cursor-pointer"
-                        onClick={() => setMenuVisible(!menuVisible)} // Alterna a visibilidade do menu
+                        onClick={() => setMenuVisible(!menuVisible)}
                     />
                     {menuVisible && (
-                        <div className="absolute right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg">
-                            <button
+                        <div className="absolute right-0 mt-2 w-fit bg-white border border-gray-300 rounded-lg shadow-lg">
+                            <div
                                 onClick={handleEndChat}
-                                className="block px-4 py-2 text-red-500 hover:bg-gray-100 w-full text-left"
+                                className="text-black hover:bg-gray-100 w-fit text-nowrap rounded-lg text-center p-2 hover:cursor-pointer"
                             >
                                 Encerrar Chat
-                            </button>
+                            </div>
                         </div>
                     )}
                 </div>
