@@ -1,28 +1,30 @@
-import {Chat, receiveMessageSchema, reciveMessage, sendMessageSchema} from "../../schema/ChatSchema.tsx";
+import {
+    Chat,
+    receiveMessageSchema,
+    reciveMessage,
+    sendMessageSchema
+} from "../../schema/ChatSchema.tsx";
 import {getEmail, getToken} from "../../services/token.tsx";
 import {useEffect, useRef, useState} from "react";
 import {connectWebSocket, disconnectWebSocket, sendMessage} from "../../services/websocket.tsx";
 import api from "../../services/api.tsx";
-
 
 interface TalkCardProps {
     chat: Chat;
 }
 
 const TalkCards: React.FC<TalkCardProps> = ({ chat }) => {
-    const [messages, setMessages] = useState<reciveMessage[]>([]); // Lista de mensagens
-    const [currentMessage, setCurrentMessage] = useState(""); // Mensagem atual
-    const [isConnected, setIsConnected] = useState(false); // Status da conexão WebSocket
-    const token = getToken(); // Token do usuário
+    const [messages, setMessages] = useState<reciveMessage[]>([]);
+    const [currentMessage, setCurrentMessage] = useState("");
+    const [isConnected, setIsConnected] = useState(false);
+    const token = getToken();
     const messageEndRef = useRef<HTMLDivElement>(null);
     const email = getEmail();
 
-    // Função para buscar mensagens antigas
     const fetchMessages = async () => {
         try {
             const response = await api.get(`/chat/message/${chat.id}`);
             const oldMessages = response.data.map((message: unknown) => {
-                // Validação Zod para cada mensagem recebida
                 return receiveMessageSchema.parse(message);
             });
             setMessages(oldMessages);
@@ -31,9 +33,7 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat }) => {
         }
     };
 
-    // Conecta ao WebSocket e busca mensagens antigas
     useEffect(() => {
-        // Callback para mensagens recebidas em tempo real
         const handleMessage = (message: unknown) => {
             try {
                 const validatedMessage = receiveMessageSchema.parse(message);
@@ -43,10 +43,7 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat }) => {
             }
         };
 
-        // Buscar mensagens antigas
         fetchMessages();
-
-        // Conectar ao WebSocket
         connectWebSocket(token, handleMessage);
         setIsConnected(true);
 
@@ -56,7 +53,6 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat }) => {
         };
     }, [token, chat.id]);
 
-    // Função para envio de mensagens
     const handleSendMessage = () => {
         if (currentMessage.trim() === "") return;
 
@@ -69,13 +65,20 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat }) => {
         try {
             const validatedMessage = sendMessageSchema.parse(messageData);
             sendMessage(validatedMessage);
-            setCurrentMessage(""); // Limpar campo de mensagem
+            setCurrentMessage("");
         } catch (error) {
             console.error("Erro ao validar mensagem enviada:", error);
         }
     };
 
-    // Scroll automático para a última mensagem
+    // Função para tratar o evento de tecla pressionada
+    const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+        if (e.key === "Enter") {
+            e.preventDefault(); // Evitar o comportamento padrão do Enter (ex.: nova linha)
+            handleSendMessage();
+        }
+    };
+
     useEffect(() => {
         if (messageEndRef.current) {
             messageEndRef.current.scrollIntoView({ behavior: "smooth" });
@@ -95,36 +98,56 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat }) => {
                 {messages.map((message) => (
                     <div
                         key={message.id}
-                        className={`p-2 mb-2 rounded-lg ${
-                            message.sender.email === email
-                                ? "bg-blue-500 text-white self-end"
-                                : "bg-gray-300 text-black self-start"
-                        }`}
+                        className={`flex ${
+                            message.sender.email === email ? "justify-end" : "justify-start"
+                        } mb-2`}
                     >
-                        {message.message}
+                        <div
+                            className={`max-w-xs p-2 rounded-lg text-sm ${
+                                message.sender.email === email
+                                    ? "bg-blue-500 text-white"
+                                    : "bg-gray-300 text-black"
+                            }`}
+                        >
+                            {message.message}
+                        </div>
                     </div>
                 ))}
                 <div ref={messageEndRef} />
             </div>
 
             {/* Campo de Envio */}
-            <div className="p-2 bg-white flex items-center">
-                <input
-                    type="text"
-                    value={currentMessage}
-                    onChange={(e) => setCurrentMessage(e.target.value)}
-                    placeholder="Digite sua mensagem"
-                    className="flex-1 border border-gray-300 rounded-lg p-2 mr-2"
-                />
-                <button
-                    onClick={handleSendMessage}
-                    className="bg-blue-500 text-white px-4 py-2 rounded-lg"
-                >
-                    Enviar
-                </button>
-            </div>
+            {chat.chatStatus=="OPEN" ? (
+                <div className="p-2 bg-white flex items-center border-t">
+                    <input
+                        type="text"
+                        value={currentMessage}
+                        onChange={(e) => setCurrentMessage(e.target.value)}
+                        onKeyDown={handleKeyDown} // Adiciona o evento para capturar Enter
+                        placeholder="Digite sua mensagem"
+                        className="flex-1 border border-gray-300 rounded-full p-2 mr-2"
+                    />
+                    <button
+                        onClick={handleSendMessage}
+                        className={`px-4 py-2 rounded-full ${
+                            currentMessage.trim()
+                                ? "bg-blue-500 text-white"
+                                : "bg-gray-300 text-gray-500 cursor-not-allowed"
+                        }`}
+                        disabled={!currentMessage.trim()}
+                    >
+                        Enviar
+                    </button>
+                </div>
+            ) : (
+                <div className="text-center p-4 text-gray-500 bg-gray-200">
+                    Chat Fechado
+                </div>
+
+            )}
         </div>
     );
 };
 
 export default TalkCards;
+
