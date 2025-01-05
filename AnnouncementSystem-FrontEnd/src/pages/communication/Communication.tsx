@@ -36,16 +36,18 @@ function Communication() {
     }, [page]);
 
     return (
-        <main>
-            <div className="grid grid-cols-2">
-                <div>
+        <main className="h-full">
+            <div className="grid grid-cols-2 gap-4 h-full">
+                <div
+                    className="h-full flex flex-col">
                     {chats.length > 0 &&
-                        chats.map((chat) =>
+                        chats.map((chat) => (
                             <ChatCards key={chat.id} chat={chat} setSelectChat={setSelectChat}/>
-                        )
+                        ))
                     }
                 </div>
-                <div>
+                <div
+                    className="h-full flex flex-col">
                     {selectChat ? (
                         <TalkCards chat={selectChat}/>
                     ) : (

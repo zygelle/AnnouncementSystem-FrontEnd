@@ -1,13 +1,13 @@
-import {
-    Chat,
-    receiveMessageSchema,
-    reciveMessage,
-    sendMessageSchema
-} from "../../schema/ChatSchema.tsx";
-import {getEmail, getToken} from "../../services/token.tsx";
-import {useEffect, useRef, useState} from "react";
-import {connectWebSocket, disconnectWebSocket, sendMessage} from "../../services/websocket.tsx";
+import { useState } from "react";
+import { Chat, receiveMessageSchema, reciveMessage, sendMessageSchema } from "../../schema/ChatSchema.tsx";
+import { getEmail, getToken } from "../../services/token.tsx";
+import { useEffect, useRef } from "react";
+import { connectWebSocket, disconnectWebSocket, sendMessage } from "../../services/websocket.tsx";
 import api from "../../services/api.tsx";
+import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
+import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
+import { setPathVisualizarAnuncio, setPathVizualizarAnunciante } from "../../routers/Paths.tsx";
+import { useNavigate } from "react-router-dom";
 
 interface TalkCardProps {
     chat: Chat;
@@ -17,9 +17,11 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat }) => {
     const [messages, setMessages] = useState<reciveMessage[]>([]);
     const [currentMessage, setCurrentMessage] = useState("");
     const [isConnected, setIsConnected] = useState(false);
+    const [menuVisible, setMenuVisible] = useState(false); // Controle de visibilidade do menu
     const token = getToken();
     const messageEndRef = useRef<HTMLDivElement>(null);
     const email = getEmail();
+    const navigate = useNavigate();
 
     const fetchMessages = async () => {
         try {
@@ -37,7 +39,7 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat }) => {
         const handleMessage = (message: unknown) => {
             try {
                 const validatedMessage = receiveMessageSchema.parse(message);
-                setMessages((prev) => [...prev, validatedMessage]);
+                setMessages((prev) => [...prev, validatedMessage]); // Adiciona as mensagens no final
             } catch (error) {
                 console.error("Erro ao validar mensagem recebida:", error);
             }
@@ -71,10 +73,9 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat }) => {
         }
     };
 
-    // Função para tratar o evento de tecla pressionada
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
-            e.preventDefault(); // Evitar o comportamento padrão do Enter (ex.: nova linha)
+            e.preventDefault();
             handleSendMessage();
         }
     };
@@ -85,45 +86,106 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat }) => {
         }
     }, [messages]);
 
+    const formatDate = (dateString: string) => {
+        const messageDate = new Date(dateString);
+        const now = new Date();
+        const diffTime = now.getTime() - messageDate.getTime();
+        const diffDays = Math.floor(diffTime / (1000 * 3600 * 24));
+
+        if (diffDays === 0) {
+            return `Hoje, ${messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        } else if (diffDays === 1) {
+            return `Ontem, ${messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
+        } else {
+            return messageDate.toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' }) + ", " +
+                messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
+        }
+    };
+
+    const handleNavigateAnnouncement = () => {
+        navigate(setPathVisualizarAnuncio(chat.announcement.id));
+    };
+
+    const handleAuthor = () => {
+        if (chat) {
+            navigate(setPathVizualizarAnunciante(chat.participant.name), {
+                state: { email: chat.participant.email },
+            });
+        } else {
+            console.log("Erro ao acessar a página do anunciante.");
+        }
+    };
+
+    const handleEndChat = () => {
+        // Lógica para encerrar o chat. Isso pode envolver uma chamada de API para fechar o chat, etc.
+        console.log("Chat encerrado");
+        setMenuVisible(false); // Esconde o menu após clicar em "Encerrar Chat"
+    };
+
     return (
         <div className="flex flex-col h-full">
-            {/* Cabeçalho do Chat */}
-            <div className="bg-blue-800 text-white p-2">
-                <div className="font-bold">{chat.announcement.title}</div>
-                <div className="text-sm">{chat.participant.name}</div>
-            </div>
-
-            {/* Corpo do Chat */}
-            <div className="flex-1 overflow-y-auto p-4 bg-gray-100">
-                {messages.map((message) => (
+            <div className="bg-blue-800 text-white p-2 flex justify-between">
+                <div>
                     <div
-                        key={message.id}
-                        className={`flex ${
-                            message.sender.email === email ? "justify-end" : "justify-start"
-                        } mb-2`}
+                        className="font-bold hover:text-lg hover:cursor-pointer"
+                        onClick={handleNavigateAnnouncement}
                     >
-                        <div
-                            className={`max-w-xs p-2 rounded-lg text-sm ${
-                                message.sender.email === email
-                                    ? "bg-blue-500 text-white"
-                                    : "bg-gray-300 text-black"
-                            }`}
-                        >
-                            {message.message}
-                        </div>
+                        {chat.announcement.title}
                     </div>
-                ))}
-                <div ref={messageEndRef} />
+                    <div
+                        className="text-sm hover:cursor-pointer hover:font-bold"
+                        onClick={handleAuthor}
+                    >
+                        {chat.participant.name}
+                    </div>
+                </div>
+                <div className="relative text-end content-center">
+                    <FontAwesomeIcon
+                        icon={faEllipsisVertical}
+                        className="w-6 h-6 cursor-pointer"
+                        onClick={() => setMenuVisible(!menuVisible)} // Alterna a visibilidade do menu
+                    />
+                    {menuVisible && (
+                        <div className="absolute right-0 mt-2 bg-white border border-gray-300 rounded-lg shadow-lg">
+                            <button
+                                onClick={handleEndChat}
+                                className="block px-4 py-2 text-red-500 hover:bg-gray-100 w-full text-left"
+                            >
+                                Encerrar Chat
+                            </button>
+                        </div>
+                    )}
+                </div>
             </div>
-
-            {/* Campo de Envio */}
-            {chat.chatStatus=="OPEN" ? (
+            <div className="flex-1 overflow-y-auto p-4 bg-gray-100">
+                <div className="max-h-[50vh] overflow-y-auto">
+                    {messages.map((message) => (
+                        <div
+                            key={message.id}
+                            className={`flex ${message.sender.email === email ? "justify-end" : "justify-start"} mb-2`}
+                        >
+                            <div
+                                className={`max-w-xs p-2 rounded-lg text-sm ${
+                                    message.sender.email === email
+                                        ? "bg-blue-500 text-white text-end"
+                                        : "bg-gray-300 text-black"
+                                }`}
+                            >
+                                <div>{message.message}</div>
+                                <div className="text-xs text-blue-950 mt-1">{formatDate(message.date)}</div>
+                            </div>
+                        </div>
+                    ))}
+                    <div ref={messageEndRef} />
+                </div>
+            </div>
+            {chat.chatStatus == "OPEN" ? (
                 <div className="p-2 bg-white flex items-center border-t">
                     <input
                         type="text"
                         value={currentMessage}
                         onChange={(e) => setCurrentMessage(e.target.value)}
-                        onKeyDown={handleKeyDown} // Adiciona o evento para capturar Enter
+                        onKeyDown={handleKeyDown}
                         placeholder="Digite sua mensagem"
                         className="flex-1 border border-gray-300 rounded-full p-2 mr-2"
                     />
@@ -143,11 +205,12 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat }) => {
                 <div className="text-center p-4 text-gray-500 bg-gray-200">
                     Chat Fechado
                 </div>
-
             )}
         </div>
     );
 };
 
 export default TalkCards;
+
+
 
