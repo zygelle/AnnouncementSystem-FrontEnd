@@ -3,12 +3,17 @@ import { useEffect, useState, useRef } from "react";
 import { Chat, PaginatedChatSchema } from "../../schema/ChatSchema.tsx";
 import ChatCards from "../../components/cards/ChatCards.tsx";
 import TalkCards from "../../components/cards/TalkCards.tsx";
+import {useLocation} from "react-router-dom";
 
 function Communication() {
+
+    const location = useLocation();
+    const initialChat: Chat | null = location.state ? location.state.chat : null;
+
     const [page, setPage] = useState<number>(0);
     const [totalPages, setTotalPages] = useState<number>(0);
     const [chats, setChats] = useState<Chat[]>([]);
-    const [selectChat, setSelectChat] = useState<Chat>();
+    const [selectChat, setSelectChat] = useState<Chat | null>(initialChat);
     const chatListRef = useRef<HTMLDivElement>(null); // Referência para o contêiner do scroll
 
     const fetchChats = async () => {
@@ -18,9 +23,12 @@ function Communication() {
             if (parsed.success) {
                 setTotalPages(parsed.data.totalPages);
                 if (page === 0) {
-                    setChats(parsed.data.content); // Carregar a primeira página de chats
+                    setChats(parsed.data.content);
+                    if (!initialChat && parsed.data.content.length > 0) {
+                        setSelectChat(parsed.data.content[0]); // Seleciona o primeiro chat diretamente
+                    }
                 } else {
-                    setChats((prev) => [...prev, ...parsed.data.content]); // Carregar chats adicionais
+                    setChats((prev) => [...prev, ...parsed.data.content]);
                 }
             } else {
                 console.error("Erro de validação", parsed.error);
@@ -29,6 +37,7 @@ function Communication() {
             console.error("Erro ao buscar os chats", error);
         }
     };
+
 
     // Adiciona o evento de scroll infinito
     const handleScroll = () => {
@@ -63,17 +72,20 @@ function Communication() {
                 <div className="h-full flex flex-col">
                     <div
                         ref={chatListRef}
-                        className="h-full overflow-y-auto max-h-[50vh] scrollbar-thin scrollbar-thumb-rounded-full scrollbar-thumb-gray-400"
+                        className="max-h-[70vh] overflow-y-auto"
                     >
-                        {chats.length > 0 &&
+                        {chats.length > 0 ? (
                             chats.map((chat) => (
-                                <ChatCards key={chat.id} chat={chat} setSelectChat={setSelectChat} />
-                            ))}
+                                <ChatCards key={chat.id} chat={chat} setSelectChat={setSelectChat}/>
+                            ))
+                        ) : (
+                            <div className="text-center p-4 text-gray-500">Nenhum chat disponível</div>
+                        )}
                     </div>
                 </div>
                 <div className="h-full flex flex-col">
                     {selectChat ? (
-                        <TalkCards chat={selectChat} />
+                        <TalkCards chat={selectChat}/>
                     ) : (
                         <div>Sem Chat</div>
                     )}

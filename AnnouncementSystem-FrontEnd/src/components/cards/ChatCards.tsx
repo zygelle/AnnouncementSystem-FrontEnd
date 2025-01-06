@@ -44,7 +44,8 @@ const ChatCards: React.FC<ChatCardProps> = ({chat, setSelectChat})=> {
     };
 
     return (
-        <div className="flex items-center gap-4 m-1 p-1 hover:border-solid hover:border-2 hover:border-blue-300 hover:cursor-pointer"
+        <div className={`flex items-center gap-4 m-1 p-1 hover:border-solid hover:border-2 hover:border-blue-300 hover:cursor-pointer ${
+                chat.chatStatus === 'CLOSED' ? 'opacity-50' : ''}`}
              onClick={() => setSelectChat(chat)}>
             <div className="w-16 h-16 overflow-hidden rounded-full flex-shrink-0">
                 <img
