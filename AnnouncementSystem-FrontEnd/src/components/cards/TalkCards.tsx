@@ -1,23 +1,30 @@
 import { useState } from "react";
-import { Chat, receiveMessageSchema, reciveMessage, sendMessageSchema } from "../../schema/ChatSchema.tsx";
+import {Chat, chatSchema, receiveMessageSchema, reciveMessage, sendMessageSchema} from "../../schema/ChatSchema.tsx";
 import { getEmail, getToken } from "../../services/token.tsx";
 import { useEffect, useRef } from "react";
 import { connectWebSocket, disconnectWebSocket, sendMessage } from "../../services/websocket.tsx";
 import api from "../../services/api.tsx";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
-import {pathAssessment, setPathVisualizarAnuncio, setPathVizualizarAnunciante} from "../../routers/Paths.tsx";
+import {
+    pathAssessment,
+    setPathVisualizarAnuncio,
+    setPathVizualizarAnunciante
+} from "../../routers/Paths.tsx";
 import { useNavigate } from "react-router-dom";
 
 interface TalkCardProps {
     chat: Chat;
+    setChat: (chat: Chat) => void;
+    removeChatById: (id: string) => void;
+    addChatToStart: (chat: Chat) => void;
 }
 
-const TalkCards: React.FC<TalkCardProps> = ({ chat }) => {
+const TalkCards: React.FC<TalkCardProps> = ({ chat, setChat, removeChatById, addChatToStart }) => {
     const [messages, setMessages] = useState<reciveMessage[]>([]);
     const [currentMessage, setCurrentMessage] = useState("");
     const [isConnected, setIsConnected] = useState<boolean>(false);
-    const [menuVisible, setMenuVisible] = useState(false); // Controle de visibilidade do menu
+    const [menuVisible, setMenuVisible] = useState(false);
     const token = getToken();
     const messageEndRef = useRef<HTMLDivElement>(null);
     const email = getEmail();
@@ -123,6 +130,26 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat }) => {
     const handleEndChat = () => {
         console.log("Chat encerrado");
         setMenuVisible(false);
+
+        const closeChat = async () => {
+            if (!chat) return;
+
+            try {
+                const response = await api.post(`/chat/close/${chat.id}`);
+                const parsed = chatSchema.safeParse(response.data);
+                if (parsed.success) {
+                    removeChatById(chat.id)
+                    addChatToStart(parsed.data)
+                    setChat(parsed.data)
+                } else {
+                    console.error("Erro de validação:", parsed.error);
+                }
+            } catch (error) {
+                console.error("Erro ao criar o chat:", error);
+            }
+        };
+
+        closeChat();
     };
 
     return (
@@ -146,12 +173,13 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat }) => {
                         </div>
                         <div
                             className="relative text-end content-center"
-                            onMouseEnter={() => setMenuVisible(true)}
+                            onMouseEnter={() => chat.chatStatus == "OPEN" ? setMenuVisible(true) : setMenuVisible(false)}
                             onMouseLeave={() => setMenuVisible(false)}
                         >
                             <FontAwesomeIcon
                                 icon={faEllipsisVertical}
-                                className="w-6 h-6 cursor-pointer"
+                                className={`w-6 h-6 ${
+                                    chat.chatStatus === 'CLOSED' ? 'opacity-50' : 'hover:cursor-pointer'}`}
                             />
                             {menuVisible && (
                                 <div
@@ -226,7 +254,9 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat }) => {
                     )}
                 </div>
             ) : (
-                <div>Sem Conecção</div>
+                <div className="flex justify-center flex-1 text-gray-500">
+                    Sem Conecção
+                </div>
             )}
         </div>
     );

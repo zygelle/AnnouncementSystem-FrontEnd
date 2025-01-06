@@ -47,9 +47,18 @@ function Communication() {
         }
     };
 
+    const addChatToStart = (newChat: Chat) => {
+        setChats((prevChats) => [newChat, ...prevChats]);
+    };
+
+
     useEffect(() => {
         fetchChats();
     }, [page]);
+
+    const removeChatById = (id: string) => {
+        setChats((prevChats) => prevChats.filter(chat => chat.id !== id));
+    };
 
     useEffect(() => {
         const chatListElement = chatListRef.current;
@@ -73,18 +82,27 @@ function Communication() {
                     >
                         {chats.length > 0 ? (
                             chats.map((chat) => (
-                                <ChatCards key={chat.id} chat={chat} setSelectChat={setSelectChat} />
+                                <ChatCards key={chat.id} chat={chat} setSelectChat={setSelectChat}/>
                             ))
                         ) : (
-                            <div className="text-center p-4 text-gray-500">Nenhum chat disponível</div>
+                            <div className="flex justify-center flex-1 text-gray-500">
+                                Nenhum chat disponível...
+                            </div>
                         )}
                     </div>
                 </div>
                 <div className="h-full flex flex-col">
-                    {selectChat ? (
-                        <TalkCards chat={selectChat} />
+                {selectChat ? (
+                        <TalkCards
+                            chat={selectChat}
+                            setChat={setSelectChat}
+                            removeChatById={removeChatById}
+                            addChatToStart={addChatToStart}
+                        />
                     ) : (
-                        <div>Sem Chat</div>
+                        <div className="flex justify-center flex-1 text-gray-500">
+                            Sem Chat
+                        </div>
                     )}
                 </div>
             </div>

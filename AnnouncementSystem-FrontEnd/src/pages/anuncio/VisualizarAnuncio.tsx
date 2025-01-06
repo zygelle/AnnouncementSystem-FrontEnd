@@ -31,7 +31,6 @@ function VisualizarAnuncio() {
                 const response = await api.post(`/chat/${ad.id}`);
                 const parsed = chatSchema.safeParse(response.data);
                 if (parsed.success) {
-                    console.log("Chat criado com sucesso:", parsed.data);
                     navigate(pathCommunication, { state: { chat: parsed.data } });
                 } else {
                     console.error("Erro de validação:", parsed.error);
@@ -43,6 +42,7 @@ function VisualizarAnuncio() {
 
         createChat();
     }
+
     const handlePrevious = () => {
         if (currentIndex > 0) {
             setCurrentIndex(currentIndex - 1);
