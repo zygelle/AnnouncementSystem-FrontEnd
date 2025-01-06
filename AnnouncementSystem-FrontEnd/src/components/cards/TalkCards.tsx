@@ -5,7 +5,7 @@ import { useEffect, useRef } from "react";
 import { connectWebSocket, disconnectWebSocket, sendMessage } from "../../services/websocket.tsx";
 import api from "../../services/api.tsx";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
-import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
+import {faArrowRight, faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
 import {
     pathAssessment,
     setPathVisualizarAnuncio,
@@ -18,9 +18,12 @@ interface TalkCardProps {
     setChat: (chat: Chat) => void;
     removeChatById: (id: string) => void;
     addChatToStart: (chat: Chat) => void;
+    setChatListVisible: (visible: boolean) => void;
+    isChatListVisible: boolean
+    isMdOrLarger: boolean
 }
 
-const TalkCards: React.FC<TalkCardProps> = ({ chat, setChat, removeChatById, addChatToStart }) => {
+const TalkCards: React.FC<TalkCardProps> = ({ chat, setChat, removeChatById, addChatToStart, setChatListVisible, isChatListVisible, isMdOrLarger }) => {
     const [messages, setMessages] = useState<reciveMessage[]>([]);
     const [currentMessage, setCurrentMessage] = useState("");
     const [isConnected, setIsConnected] = useState<boolean>(false);
@@ -156,13 +159,20 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat, setChat, removeChatById, add
         <div className="flex flex-col h-full">
             {isConnected ? (
                 <div className="flex flex-col h-full">
-                    <div className="bg-blue-800 text-white p-2 flex justify-between">
-                        <div>
+                    <div className="bg-blue-800 text-white p-2 flex justify-betwee ">
+                        {(!isChatListVisible && !isMdOrLarger) &&
+                            <div className="text-start content-center m-1 p-1 items-center"
+                                 onClick={() => setChatListVisible(true)}>
+                                <FontAwesomeIcon icon={faArrowRight} rotation={180}
+                                                 className="w-6 h-6 hover:cursor-pointer"/>
+                            </div>
+                        }
+                        <div className="text-start w-full mx-1">
                             <div
                                 className="font-bold hover:text-lg hover:cursor-pointer"
                                 onClick={handleNavigateAnnouncement}
                             >
-                                {chat.announcement.title}
+                            {chat.announcement.title}
                             </div>
                             <div
                                 className="text-sm hover:cursor-pointer hover:font-bold"

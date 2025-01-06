@@ -13,18 +13,21 @@ function Communication() {
     const [totalPages, setTotalPages] = useState<number>(0);
     const [chats, setChats] = useState<Chat[]>([]);
     const [selectChat, setSelectChat] = useState<Chat | null>(initialChat);
-    const chatListRef = useRef<HTMLDivElement>(null); // Referência para o contêiner do scroll
+    const [isChatListVisible, setChatListVisible] = useState<boolean>(true);
+    const [isMdOrLarger, setIsMdOrLarger] = useState<boolean>(window.innerWidth >= 768);
+
+    const chatListRef = useRef<HTMLDivElement>(null);
 
     const fetchChats = async () => {
         try {
-            const response = await api.get(`chat?page=${page}&size=10`);
+            const response = await api.get(`chat?page=${page}&size=12`);
             const parsed = PaginatedChatSchema.safeParse(response.data);
             if (parsed.success) {
                 setTotalPages(parsed.data.totalPages);
                 if (page === 0) {
                     setChats(parsed.data.content);
                     if (!initialChat && parsed.data.content.length > 0) {
-                        setSelectChat(parsed.data.content[0]); // Seleciona o primeiro chat diretamente
+                        setSelectChat(parsed.data.content[0]);
                     }
                 } else {
                     setChats((prev) => [...prev, ...parsed.data.content]);
@@ -37,10 +40,19 @@ function Communication() {
         }
     };
 
+    const handleResize = () => {
+        setIsMdOrLarger(window.innerWidth >= 768);
+    };
+
+    useEffect(() => {
+        fetchChats();
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+    }, [page]);
+
     const handleScroll = () => {
         if (chatListRef.current) {
             const { scrollTop, clientHeight, scrollHeight } = chatListRef.current;
-            console.log(`ScrollTop: ${scrollTop}, ClientHeight: ${clientHeight}, ScrollHeight: ${scrollHeight}`);
             if (scrollTop + clientHeight >= scrollHeight - 10 && page < totalPages - 1) {
                 setPage((prev) => prev + 1);
             }
@@ -51,13 +63,8 @@ function Communication() {
         setChats((prevChats) => [newChat, ...prevChats]);
     };
 
-
-    useEffect(() => {
-        fetchChats();
-    }, [page]);
-
     const removeChatById = (id: string) => {
-        setChats((prevChats) => prevChats.filter(chat => chat.id !== id));
+        setChats((prevChats) => prevChats.filter((chat) => chat.id !== id));
     };
 
     useEffect(() => {
@@ -74,41 +81,59 @@ function Communication() {
 
     return (
         <main className="h-full">
-            <div className="grid grid-cols-2 gap-4 h-full">
-                <div className="h-full flex flex-col">
-                    <div
-                        ref={chatListRef}
-                        className="max-h-[70vh] overflow-y-auto"
-                    >
-                        {chats.length > 0 ? (
-                            chats.map((chat) => (
-                                <ChatCards key={chat.id} chat={chat} setSelectChat={setSelectChat}/>
-                            ))
+            <div className="grid grid-cols-1 md:grid-cols-2 gap-1 h-full">
+                {/* Lista de Chats */}
+                {(isChatListVisible || isMdOrLarger) && (
+                    <div className="h-full flex flex-col">
+                        <div
+                            ref={chatListRef}
+                            className="max-h-[70vh] overflow-y-auto"
+                        >
+                            {chats.length > 0 ? (
+                                chats.map((chat) => (
+                                    <ChatCards
+                                        key={chat.id}
+                                        chat={chat}
+                                        setSelectChat={(chat) => {
+                                            setSelectChat(chat);
+                                            setChatListVisible(false);
+                                        }}
+                                    />
+                                ))
+                            ) : (
+                                <div className="flex justify-center flex-1 text-gray-500">
+                                    Nenhum chat disponível...
+                                </div>
+                            )}
+                        </div>
+                    </div>
+                )}
+
+                {(!isChatListVisible || isMdOrLarger) && (
+                    <div className="h-full flex flex-col">
+                        {selectChat ? (
+                            <TalkCards
+                                chat={selectChat}
+                                setChat={setSelectChat}
+                                removeChatById={removeChatById}
+                                addChatToStart={addChatToStart}
+                                setChatListVisible={setChatListVisible}
+                                isChatListVisible={isChatListVisible}
+                                isMdOrLarger={isMdOrLarger}
+                            />
                         ) : (
                             <div className="flex justify-center flex-1 text-gray-500">
-                                Nenhum chat disponível...
+                                Sem Chat
                             </div>
                         )}
                     </div>
-                </div>
-                <div className="h-full flex flex-col">
-                {selectChat ? (
-                        <TalkCards
-                            chat={selectChat}
-                            setChat={setSelectChat}
-                            removeChatById={removeChatById}
-                            addChatToStart={addChatToStart}
-                        />
-                    ) : (
-                        <div className="flex justify-center flex-1 text-gray-500">
-                            Sem Chat
-                        </div>
-                    )}
-                </div>
+                )}
             </div>
         </main>
     );
 }
 
 export default Communication;
+
+
 
