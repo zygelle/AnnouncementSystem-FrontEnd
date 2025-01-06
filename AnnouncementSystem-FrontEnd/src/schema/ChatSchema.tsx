@@ -1,23 +1,21 @@
 import { z } from 'zod';
 
-// Esquema para validação de mensagens recebidas
 export const receiveMessageSchema = z.object({
-    id: z.string().uuid(), // ID da mensagem
-    message: z.string().min(1), // Corrigido de "content" para "message"
+    id: z.string().uuid(),
+    message: z.string().min(1),
     sender: z.object({
-        email: z.string().email(), // E-mail do remetente
-        name: z.string().min(1), // Nome do remetente
+        email: z.string().email(),
+        name: z.string().min(1),
     }),
-    date: z.string(), // Corrigido para aceitar strings diretamente
+    date: z.string(),
 });
 
 export type reciveMessage = z.infer<typeof receiveMessageSchema>
 
-// Esquema para envio de mensagens
 export const sendMessageSchema = z.object({
-    chat: z.string().uuid(), // ID do chat
+    chat: z.string().uuid(),
     email: z.string().email(),
-    message: z.string().min(1), // Conteúdo da mensagem
+    message: z.string().min(1),
 });
 
 export type SendMessage = z.infer<typeof sendMessageSchema>
@@ -36,6 +34,7 @@ export const chatSchema = z.object({
     }),
     chatStatus: z.string(),
     dateLastMessage: z.string().nullable(),
+    isEvaluated: z.boolean()
 });
 
 export type Chat = z.infer<typeof chatSchema>

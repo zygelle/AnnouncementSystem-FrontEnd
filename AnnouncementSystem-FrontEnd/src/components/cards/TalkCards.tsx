@@ -6,7 +6,7 @@ import { connectWebSocket, disconnectWebSocket, sendMessage } from "../../servic
 import api from "../../services/api.tsx";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faEllipsisVertical } from "@fortawesome/free-solid-svg-icons";
-import { setPathVisualizarAnuncio, setPathVizualizarAnunciante } from "../../routers/Paths.tsx";
+import {pathAssessment, setPathVisualizarAnuncio, setPathVizualizarAnunciante} from "../../routers/Paths.tsx";
 import { useNavigate } from "react-router-dom";
 
 interface TalkCardProps {
@@ -39,7 +39,7 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat }) => {
         const handleMessage = (message: unknown) => {
             try {
                 const validatedMessage = receiveMessageSchema.parse(message);
-                setMessages((prev) => [...prev, validatedMessage]); // Adiciona as mensagens no final
+                setMessages((prev) => [...prev, validatedMessage]);
             } catch (error) {
                 console.error("Erro ao validar mensagem recebida:", error);
             }
@@ -105,6 +105,10 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat }) => {
     const handleNavigateAnnouncement = () => {
         navigate(setPathVisualizarAnuncio(chat.announcement.id));
     };
+
+    const handleToAssess = () => {
+        navigate(pathAssessment)
+    }
 
     const handleAuthor = () => {
         if (chat) {
@@ -208,8 +212,16 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat }) => {
                             </button>
                         </div>
                     ) : (
-                        <div className="text-center p-4 text-gray-500 bg-gray-200">
-                            Chat Fechado
+                        <div>
+                            {chat.isEvaluated ? (
+                                <div className="text-center p-4 text-gray-500 bg-gray-200">
+                                    Chat Fechado
+                                </div>
+                            ) : (
+                                <div className="text-center p-4 text-gray-500 bg-gray-200">
+                                    <span className="hover:font-bold hover:cursor-pointer" onClick={handleToAssess} >Avalie</span> o usuário...
+                                </div>
+                            )}
                         </div>
                     )}
                 </div>

@@ -3,10 +3,9 @@ import { useEffect, useState, useRef } from "react";
 import { Chat, PaginatedChatSchema } from "../../schema/ChatSchema.tsx";
 import ChatCards from "../../components/cards/ChatCards.tsx";
 import TalkCards from "../../components/cards/TalkCards.tsx";
-import {useLocation} from "react-router-dom";
+import { useLocation } from "react-router-dom";
 
 function Communication() {
-
     const location = useLocation();
     const initialChat: Chat | null = location.state ? location.state.chat : null;
 
@@ -18,7 +17,7 @@ function Communication() {
 
     const fetchChats = async () => {
         try {
-            const response = await api.get(`chat?page=${page}&size=5`);
+            const response = await api.get(`chat?page=${page}&size=10`);
             const parsed = PaginatedChatSchema.safeParse(response.data);
             if (parsed.success) {
                 setTotalPages(parsed.data.totalPages);
@@ -38,15 +37,13 @@ function Communication() {
         }
     };
 
-
-    // Adiciona o evento de scroll infinito
     const handleScroll = () => {
-        if (
-            chatListRef.current &&
-            chatListRef.current.scrollTop + chatListRef.current.clientHeight >= chatListRef.current.scrollHeight &&
-            page < totalPages - 1
-        ) {
-            setPage((prev) => prev + 1); // Carregar a próxima página
+        if (chatListRef.current) {
+            const { scrollTop, clientHeight, scrollHeight } = chatListRef.current;
+            console.log(`ScrollTop: ${scrollTop}, ClientHeight: ${clientHeight}, ScrollHeight: ${scrollHeight}`);
+            if (scrollTop + clientHeight >= scrollHeight - 10 && page < totalPages - 1) {
+                setPage((prev) => prev + 1);
+            }
         }
     };
 
@@ -76,7 +73,7 @@ function Communication() {
                     >
                         {chats.length > 0 ? (
                             chats.map((chat) => (
-                                <ChatCards key={chat.id} chat={chat} setSelectChat={setSelectChat}/>
+                                <ChatCards key={chat.id} chat={chat} setSelectChat={setSelectChat} />
                             ))
                         ) : (
                             <div className="text-center p-4 text-gray-500">Nenhum chat disponível</div>
@@ -85,7 +82,7 @@ function Communication() {
                 </div>
                 <div className="h-full flex flex-col">
                     {selectChat ? (
-                        <TalkCards chat={selectChat}/>
+                        <TalkCards chat={selectChat} />
                     ) : (
                         <div>Sem Chat</div>
                     )}
@@ -96,3 +93,4 @@ function Communication() {
 }
 
 export default Communication;
+
