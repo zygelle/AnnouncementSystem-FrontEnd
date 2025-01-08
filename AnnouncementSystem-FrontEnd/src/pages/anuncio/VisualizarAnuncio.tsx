@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import {Ad, AdSchema, FilterRequest} from "../../schema/AdSchema.tsx";
 import api from "../../services/api.tsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faStarHalfStroke, faTag} from "@fortawesome/free-solid-svg-icons";
+import {faStarHalfStroke, faTag, faHeart, faHeartCrack } from "@fortawesome/free-solid-svg-icons";
 import {getDownloadURL, listAll, ref} from "firebase/storage";
 import {storage} from "../../services/firebaseConfig.tsx";
 import {pathFilterAd, setPathVizualizarAnunciante} from "../../routers/Paths.tsx";
@@ -19,6 +19,7 @@ function VisualizarAnuncio() {
     const navigate = useNavigate();
     const [selectedImage, setSelectedImage] = useState<string>(defaultImage);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [isFavorite, setIsFavorite] = useState(false);
 
     const handlePrevious = () => {
         if (currentIndex > 0) {
@@ -135,8 +136,33 @@ function VisualizarAnuncio() {
         }
     }
 
+    const toggleFavorite = async () => {
+        try {
+            if (isFavorite) {
+                await api.delete(`/favorite/${id}`);
+                alert("Anúncio desfavoritado!");
+            } else {
+                await api.post(`/favorite/${id}`);
+                alert("Anúncio favoritado!");
+            }
+            setIsFavorite(!isFavorite);
+        } catch (error) {
+            console.error("Erro ao alterar o estado de favorito:", error);
+        }
+    };
+
     useEffect(() => {
         fetchAd();
+
+        async function checkFavorite() {
+            try {
+                const response = await api.get(`/favorite/${id}`);
+                setIsFavorite(response.data);
+            } catch (error) {
+                console.error("Erro ao verificar se o anúncio é favorito:", error);
+            }
+        }
+        checkFavorite();
     }, [id]);
 
     if (error) return <p className="text-red-500">Erro: {error}</p>;
@@ -144,6 +170,16 @@ function VisualizarAnuncio() {
 
     return (
         <main className="main-layout">
+            <div className="flex justify-start ml-6 mb-6">
+                <div className="flex justify-start md:order-2">
+                    <button
+                        className="text-red-500 text-xl"
+                        onClick={toggleFavorite}
+                    >
+                        <FontAwesomeIcon icon={isFavorite ? faHeart : faHeartCrack} />
+                    </button>
+                </div>
+            </div>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <div className="grid grid-cols-2 text-sm md:order-2">
                     <div>{ad.city.name}</div>
@@ -250,7 +286,7 @@ function VisualizarAnuncio() {
                         {ad.categories.map((category, index) => (
                             <div key={index} onClick={() => handleCategoria(category.id)}>
                                 <span className="inline-block bg-blue-200 text-blue-800 px-3 py-1 me-1 rounded-full hover:cursor-pointer hover:bg-blue-400 hover:text-white">
-                                  <FontAwesomeIcon icon={faTag}/> {category?.name}
+                                    <FontAwesomeIcon icon={faTag}/> {category?.name}
                                 </span>
                             </div>
                         ))}
