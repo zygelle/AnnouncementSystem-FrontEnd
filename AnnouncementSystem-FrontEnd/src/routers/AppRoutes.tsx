@@ -18,7 +18,6 @@ import Communication from "../pages/communication/Communication.tsx";
 import Perfil from "../pages/perfil/Perfil.tsx";
 import MeusAnuncios from "../pages/anuncio/MeusAnuncios.tsx";
 import Anuncios from "../pages/anuncio/Anuncios.tsx";
-import Anunciante from "../pages/perfil/Anunciante.tsx";
 import VisualizarAnuncio from "../pages/anuncio/VisualizarAnuncio.tsx";
 import { EditarAnuncio } from "../pages/anuncio/EditarAnuncio.tsx";
 import Assessment from "../pages/assessment/Assessment.tsx";
@@ -78,7 +77,7 @@ const router = createBrowserRouter([
                 },
                 {
                     path: pathVizualizarAnunciante,
-                    element: <Anunciante />
+                    element: <Perfil />
                 },
                 {
                     path: pathAssessment,

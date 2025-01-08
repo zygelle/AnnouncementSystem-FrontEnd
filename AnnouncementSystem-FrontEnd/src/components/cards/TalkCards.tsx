@@ -6,11 +6,7 @@ import { connectWebSocket, disconnectWebSocket, sendMessage } from "../../servic
 import api from "../../services/api.tsx";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faArrowRight, faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
-import {
-    pathAssessment,
-    setPathVisualizarAnuncio,
-    setPathVizualizarAnunciante
-} from "../../routers/Paths.tsx";
+import {pathAssessment, setPathVisualizarAnuncio, setPathVizualizarAnunciante} from "../../routers/Paths.tsx";
 import { useNavigate } from "react-router-dom";
 
 interface TalkCardProps {
@@ -123,7 +119,7 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat, setChat, removeChatById, add
     const handleAuthor = () => {
         if (chat) {
             navigate(setPathVizualizarAnunciante(chat.participant.name), {
-                state: { email: chat.participant.email },
+                state: { advertiserEmail: chat.participant.email },
             });
         } else {
             console.log("Erro ao acessar a página do anunciante.");

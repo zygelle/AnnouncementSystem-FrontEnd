@@ -58,7 +58,7 @@ function VisualizarAnuncio() {
     function handleAuthor(){
         if(ad && ad.author && ad.author){
             navigate(setPathVizualizarAnunciante(ad.author.name), {
-                state: { email: ad.author.email }
+                state: { advertiserEmail: ad.author.email }
             });
         }
         else console.log("Erro ao acessar o página do anunciante.")
