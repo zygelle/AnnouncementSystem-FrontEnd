@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import {Ad, AdSchema, FilterRequest} from "../../schema/AdSchema.tsx";
 import api from "../../services/api.tsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faStarHalfStroke, faTag, faEdit, faTrash} from "@fortawesome/free-solid-svg-icons";
+import {faStarHalfStroke, faTag, faEdit, faTrash, faHeart, faHeartCrack} from "@fortawesome/free-solid-svg-icons";
 import {getDownloadURL, listAll, ref} from "firebase/storage";
 import {storage} from "../../services/firebaseConfig.tsx";
 import {pathCommunication, pathFilterAd, setPathVizualizarAnunciante} from "../../routers/Paths.tsx";
@@ -20,6 +20,7 @@ function VisualizarAnuncio() {
     const defaultImage = "/images/img-padrao.PNG";
     const [selectedImage, setSelectedImage] = useState<string>(defaultImage);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const [isFavorite, setIsFavorite] = useState(false);
     const navigate = useNavigate();
     const userEmail = getEmail();
 
@@ -182,8 +183,33 @@ function VisualizarAnuncio() {
         }
     }
 
+    const toggleFavorite = async () => {
+        try {
+            if (isFavorite) {
+                await api.delete(`/favorite/${id}`);
+                alert("Anúncio desfavoritado!");
+            } else {
+                await api.post(`/favorite/${id}`);
+                alert("Anúncio favoritado!");
+            }
+            setIsFavorite(!isFavorite);
+        } catch (error) {
+            console.error("Erro ao alterar o estado de favorito:", error);
+        }
+    };
+
     useEffect(() => {
         fetchAd();
+
+        async function checkFavorite() {
+            try {
+                const response = await api.get(`/favorite/${id}`);
+                setIsFavorite(response.data);
+            } catch (error) {
+                console.error("Erro ao verificar se o anúncio é favorito:", error);
+            }
+        }
+        checkFavorite();
     }, [id]);
 
     if (error) return <p className="text-red-500">Erro: {error}</p>;
@@ -191,23 +217,33 @@ function VisualizarAnuncio() {
 
     return (
         <main className="main-layout">
-            <div className="flex justify-end mb-6">
-                {ad.author.email === userEmail && (
-                    <button
-                        className="mr-4 bottom-4 bg-green-500 text-white px-4 py-1 rounded-xl hover:bg-green-700"
-                        onClick={handleEdit}
-                    >
-                        <FontAwesomeIcon icon={faEdit}/>
-                    </button>
-                )}
-                {ad.author.email === userEmail && (
-                    <button
-                        className="bottom-4 bg-red-500 text-white px-4 py-1 rounded-xl hover:bg-red-700"
-                        onClick={handleDelete}
-                    >
-                        <FontAwesomeIcon icon={faTrash} />
-                    </button>
-                )}
+            <div className="flex justify-between">
+              <div className="ml-6 mb-6">
+                <button
+                    className="text-red-500 text-xl"
+                    onClick={toggleFavorite}
+                >
+                    <FontAwesomeIcon icon={isFavorite ? faHeart : faHeartCrack} />
+                </button>
+              </div>
+              <div className="flex justify-end mb-6">
+                  {ad.author.email === userEmail && (
+                      <button
+                          className="mr-4 bottom-4 bg-green-500 text-white px-4 py-1 rounded-xl hover:bg-green-700"
+                          onClick={handleEdit}
+                      >
+                          <FontAwesomeIcon icon={faEdit}/>
+                      </button>
+                  )}
+                  {ad.author.email === userEmail && (
+                      <button
+                          className="bottom-4 bg-red-500 text-white px-4 py-1 rounded-xl hover:bg-red-700"
+                          onClick={handleDelete}
+                      >
+                          <FontAwesomeIcon icon={faTrash} />
+                      </button>
+                  )}
+              </div>
             </div>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <div className="grid grid-cols-2 text-sm md:order-2">
