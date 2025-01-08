@@ -147,93 +147,96 @@ export function CriarAnuncio(){
     }
 
     return (
-        <div className="flex flex-col bg-slate-100 items-center justify-center">
-            <main className="w-full max-w-3xl flex flex-col p-8 rounded-lg bg-white shadow-2x mb-20">
-                <div className="flex flex-col items-center mb-6">
-                    <PhotoUpload
-                        Images={setImages}
-                        isImages={setIsImages}
-                    />
+        <main>
+            <div className="flex flex-colitems-center justify-center">
+                <div className="w-full flex flex-col p-8 rounded-lg shadow-2x">
+                    <div className="flex flex-col items-center mb-6">
+                        <PhotoUpload
+                            Images={setImages}
+                            isImages={setIsImages}
+                        />
+                    </div>
+                    <div className="gap-2.5 mt-5 max-w-full">
+                        <form onSubmit={handleSubmit(criar)} className="grid grid-cols-2 gap-6">
+                            <div className="flex flex-col gap-4">
+                                <div>
+                                    <label className="mb-2">Título</label>
+                                    <input
+                                        {...register("title")}
+                                        className="w-full border border-slate-300 h-9 rounded-md outline-none px-2 mb-4"
+                                        placeholder="Título"
+                                    />
+                                    {errors.title && <span className="text-red-600">{errors.title.message}</span>}
+                                </div>
+                                <div>
+                                    <label className="mb-2">Descrição do Anúncio</label>
+                                    <textarea
+                                        {...register("content")}
+                                        rows={4}
+                                        className="block p-2 w-full text-sm text-gray-900 rounded-lg border border-gray-300 focus:outline-slate-300"
+                                    />
+                                    {errors.content && <span className='text-red-600'>{errors.content.message}</span>}
+                                </div>
+                                <div>
+                                    <label className="mb-2">Localização</label>
+                                    <Select
+                                        {...register("city")}
+                                        options={citySelectOptions}
+                                        onChange={(selectedOption) => {
+                                            setValue("city", selectedOption ? selectedOption.value : '');
+                                        }}
+                                        className="input"
+                                        placeholder="Selecione a cidade"
+                                    />
+                                    {errors.city && <span className='text-red-600'>{errors.city.message}</span>}
+                                </div>
+                            </div>
+                            <div className="flex flex-col gap-4">
+                                <div>
+                                    <label className="mb-2">Categorias</label>
+                                    <Select
+                                        {...register("categories")}
+                                        options={categorySelectOptions}
+                                        isMulti
+                                        onChange={(selectedOptions) => {
+                                            const selectedValues = selectedOptions ? selectedOptions.map(option => option.value) : [];
+                                            setValue("categories", selectedValues);
+                                        }}
+                                        className="input"
+                                        placeholder="Selecione as categorias"
+                                    />
+                                    {errors.categories &&
+                                        <span className='text-red-600'>{errors.categories.message}</span>}
+                                </div>
+                                <div>
+                                    <label className="mb-2">Preço (R$)</label>
+                                    <input
+                                        {...register("price", {valueAsNumber: true})}
+                                        className='w-full border border-slate-300 h-9 rounded-md outline-none px-2 mb-4'
+                                        placeholder="0.0"
+                                        step={.01}
+                                        defaultValue={0}
+                                        type="number"
+                                    />
+                                    {errors.price && <span className='text-red-600'>{errors.price.message}</span>}
+                                </div>
+                            </div>
+                            <div className="col-span-2 flex justify-center gap-4">
+                                <button
+                                    type="reset"
+                                    className="h-9 hover:bg-slate-200 rounded border-slate-200 border-2 text-lg px-4">
+                                    Cancelar
+                                </button>
+                                <button
+                                    type="submit"
+                                    className="h-9 bg-blue-900 hover:bg-blue-700 rounded border-0 text-lg text-white px-4">
+                                    Anunciar
+                                </button>
+                            </div>
+                        </form>
+                    </div>
                 </div>
-                <div className="gap-2.5 mt-5 max-w-full">
-                    <form onSubmit={handleSubmit(criar)} className="grid grid-cols-2 gap-6">
-                        <div className="flex flex-col gap-4">
-                            <div>
-                                <label className="mb-2">Título</label>
-                                <input
-                                    {...register("title")}
-                                    className="w-full border border-slate-300 h-9 rounded-md outline-none px-2 mb-4"
-                                    placeholder="Título"
-                                />
-                                {errors.title && <span className="text-red-600">{errors.title.message}</span>}
-                            </div>
-                            <div>
-                                <label className="mb-2">Descrição do Anúncio</label>
-                                <textarea
-                                    {...register("content")}
-                                    rows={4}
-                                    className="block p-2 w-full text-sm text-gray-900 rounded-lg border border-gray-300 focus:outline-slate-300"
-                                />
-                                {errors.content && <span className='text-red-600'>{errors.content.message}</span>}
-                            </div>
-                            <div>
-                                <label className="mb-2">Localização</label>
-                                <Select
-                                    {...register("city")}
-                                    options={citySelectOptions}
-                                    onChange={(selectedOption) => {
-                                        setValue("city", selectedOption ? selectedOption.value : '');
-                                    }}
-                                    className="input"
-                                    placeholder="Selecione a cidade"
-                                />
-                                {errors.city && <span className='text-red-600'>{errors.city.message}</span>}
-                            </div>
-                        </div>
-                        <div className="flex flex-col gap-4">
-                            <div>
-                                <label className="mb-2">Categorias</label>
-                                <Select
-                                    {...register("categories")}
-                                    options={categorySelectOptions}
-                                    isMulti
-                                    onChange={(selectedOptions) => {
-                                        const selectedValues = selectedOptions ? selectedOptions.map(option => option.value) : [];
-                                        setValue("categories", selectedValues);
-                                    }}
-                                    className="input"
-                                    placeholder="Selecione as categorias"
-                                />
-                                {errors.categories && <span className='text-red-600'>{errors.categories.message}</span>}
-                            </div>
-                            <div>
-                                <label className="mb-2">Preço (R$)</label>
-                                <input
-                                    {...register("price", { valueAsNumber: true })}
-                                    className='w-full border border-slate-300 h-9 rounded-md outline-none px-2 mb-4'
-                                    placeholder="0.0"
-                                    step={.01}
-                                    defaultValue={0}
-                                    type="number"
-                                />
-                                {errors.price && <span className='text-red-600'>{errors.price.message}</span>}
-                            </div>
-                        </div>
-                        <div className="col-span-2 flex justify-center gap-4">
-                            <button
-                                type="reset"
-                                className="h-9 hover:bg-slate-200 rounded border-slate-200 border-2 text-lg px-4">
-                                Cancelar
-                            </button>
-                            <button
-                                type="submit"
-                                className="h-9 bg-blue-900 hover:bg-blue-700 rounded border-0 text-lg text-white px-4">
-                                Anunciar
-                            </button>
-                        </div>
-                    </form>
-                </div>
-            </main>
-        </div>
+            </div>
+        </main>
     );
 }
