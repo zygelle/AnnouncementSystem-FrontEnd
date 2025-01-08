@@ -221,7 +221,7 @@ export function EditarAnuncio() {
                         </div>
                         <div className="col-span-2 flex justify-center gap-4">
                             <button
-                                type="reset"
+                                onClick={() => {id ? navigate(setPathVisualizarAnuncio(id)) : console.error('ID está indefinido!')}}
                                 className="h-9 hover:bg-slate-200 rounded border-slate-200 border-2 text-lg px-4">
                                 Cancelar
                             </button>
