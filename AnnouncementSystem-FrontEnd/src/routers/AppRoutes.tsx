@@ -1,6 +1,7 @@
 import {isAuthenticated} from "../services/token.tsx";
 import {createBrowserRouter, Navigate, Outlet, RouterProvider} from "react-router-dom";
 import {
+    pathAssessment,
     pathCommunication,
     pathCreateAds,
     pathFilterAd,
@@ -20,6 +21,7 @@ import Anuncios from "../pages/anuncio/Anuncios.tsx";
 import Anunciante from "../pages/perfil/Anunciante.tsx";
 import VisualizarAnuncio from "../pages/anuncio/VisualizarAnuncio.tsx";
 import { EditarAnuncio } from "../pages/anuncio/EditarAnuncio.tsx";
+import Assessment from "../pages/assessment/Assessment.tsx";
 
 const ProtectedRoute = () => {
     return isAuthenticated() ? <Outlet /> : <Navigate to={pathLogin} />;
@@ -77,6 +79,10 @@ const router = createBrowserRouter([
                 {
                     path: pathVizualizarAnunciante,
                     element: <Anunciante />
+                },
+                {
+                    path: pathAssessment,
+                    element: <Assessment/>
                 }
             ]
         }]

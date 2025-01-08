@@ -14,3 +14,4 @@ export const pathVizualizarAnunciante = '/anunciante/:name'
 export const setPathVizualizarAnunciante = (name: string) => {
     return `/anunciante/${name}`
 }
+export const pathAssessment = '/avaliacao'

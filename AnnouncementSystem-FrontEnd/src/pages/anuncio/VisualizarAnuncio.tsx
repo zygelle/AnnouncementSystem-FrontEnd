@@ -6,8 +6,9 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faStarHalfStroke, faTag, faEdit, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {getDownloadURL, listAll, ref} from "firebase/storage";
 import {storage} from "../../services/firebaseConfig.tsx";
-import {pathFilterAd, setPathVizualizarAnunciante} from "../../routers/Paths.tsx";
-import { getEmail } from "../../services/token.tsx";
+import {pathCommunication, pathFilterAd, setPathVizualizarAnunciante} from "../../routers/Paths.tsx";
+import {getEmail} from "../../services/token.tsx";
+import {chatSchema} from "../../schema/ChatSchema.tsx";
 
 function VisualizarAnuncio() {
 
@@ -21,6 +22,27 @@ function VisualizarAnuncio() {
     const [currentIndex, setCurrentIndex] = useState(0);
     const navigate = useNavigate();
     const userEmail = getEmail();
+
+    function handleCreateChat() {
+
+        const createChat = async () => {
+            if (!ad) return;
+
+            try {
+                const response = await api.post(`/chat/${ad.id}`);
+                const parsed = chatSchema.safeParse(response.data);
+                if (parsed.success) {
+                    navigate(pathCommunication, { state: { chat: parsed.data } });
+                } else {
+                    console.error("Erro de validação:", parsed.error);
+                }
+            } catch (error) {
+                console.error("Erro ao criar o chat:", error);
+            }
+        };
+
+        createChat();
+    }
 
     const handlePrevious = () => {
         if (currentIndex > 0) {
@@ -281,11 +303,14 @@ function VisualizarAnuncio() {
                         </div>
                     </div>
                     <div className="flex justify-end mx-8 col-start-2 col-end-2">
-                        <button className="bg-blue-500 px-4 py-1 rounded-xl text-white
-                                            hover:bg-blue-800
-                        ">
-                            Contatar
-                        </button>
+                        {ad.author.email != getEmail() &&
+                            <button className="bg-blue-500 px-4 py-1 rounded-xl text-white
+                                            hover:bg-blue-800"
+                                    onClick={handleCreateChat}
+                            >
+                                Contatar
+                            </button>
+                        }
                     </div>
                 </div>
                 <div className="flex md:justify-end md:order-2 md:col-span-2">
