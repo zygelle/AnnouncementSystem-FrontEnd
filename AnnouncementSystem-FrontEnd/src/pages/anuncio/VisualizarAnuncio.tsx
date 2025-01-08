@@ -303,7 +303,7 @@ function VisualizarAnuncio() {
                     </div>
                 </div>
                 <div className="text-2xl font-semibold md:order-2">{ad.title}</div>
-                <div className="md:order-2">
+                <div className="md:order-2 overflow-x-auto py-2">
                     {ad.content}
                 </div>
                 <div className="grid grid-cols-2 gap-2 justify-between md:order-2">

@@ -12,7 +12,7 @@ import {
 } from "./Paths.tsx";
 import {Login} from "../pages/login/Login.tsx";
 import {Home} from "../pages/home/Home.tsx";
-import {CriarAnuncio} from "../pages/anuncio/criar";
+import {CriarAnuncio} from "../pages/anuncio/criar/CriarAnuncio.tsx";
 import Navbar from "../components/Navbar.tsx";
 import Communication from "../pages/communication/Communication.tsx";
 import Perfil from "../pages/perfil/Perfil.tsx";
