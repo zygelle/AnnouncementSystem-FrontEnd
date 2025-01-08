@@ -3,10 +3,12 @@ import {useEffect, useState} from "react";
 import {Ad, AdSchema, FilterRequest} from "../../schema/AdSchema.tsx";
 import api from "../../services/api.tsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faStarHalfStroke, faTag, faHeart, faHeartCrack } from "@fortawesome/free-solid-svg-icons";
+import {faStarHalfStroke, faTag, faEdit, faTrash, faHeart, faHeartCrack} from "@fortawesome/free-solid-svg-icons";
 import {getDownloadURL, listAll, ref} from "firebase/storage";
 import {storage} from "../../services/firebaseConfig.tsx";
-import {pathFilterAd, setPathVizualizarAnunciante} from "../../routers/Paths.tsx";
+import {pathCommunication, pathFilterAd, setPathVizualizarAnunciante} from "../../routers/Paths.tsx";
+import {getEmail} from "../../services/token.tsx";
+import {chatSchema} from "../../schema/ChatSchema.tsx";
 
 function VisualizarAnuncio() {
 
@@ -16,10 +18,32 @@ function VisualizarAnuncio() {
     const [imgPerfil, setImgPerfil] = useState<string>('/images/img-padrao.PNG');
     const [images, setImagens] = useState<string[]>([]);
     const defaultImage = "/images/img-padrao.PNG";
-    const navigate = useNavigate();
     const [selectedImage, setSelectedImage] = useState<string>(defaultImage);
     const [currentIndex, setCurrentIndex] = useState(0);
     const [isFavorite, setIsFavorite] = useState(false);
+    const navigate = useNavigate();
+    const userEmail = getEmail();
+
+    function handleCreateChat() {
+
+        const createChat = async () => {
+            if (!ad) return;
+
+            try {
+                const response = await api.post(`/chat/${ad.id}`);
+                const parsed = chatSchema.safeParse(response.data);
+                if (parsed.success) {
+                    navigate(pathCommunication, { state: { chat: parsed.data } });
+                } else {
+                    console.error("Erro de validação:", parsed.error);
+                }
+            } catch (error) {
+                console.error("Erro ao criar o chat:", error);
+            }
+        };
+
+        createChat();
+    }
 
     const handlePrevious = () => {
         if (currentIndex > 0) {
@@ -38,6 +62,29 @@ function VisualizarAnuncio() {
             });
         }
         else console.log("Erro ao acessar o página do anunciante.")
+    }
+    function handleEdit() {
+        if (ad && ad.author.email === userEmail) {
+            navigate(`/anuncio/editar/${ad.id}`);
+        } else {
+            console.log("Você não pode editar este anúncio.");
+        }
+    }
+    async function handleDelete() {
+        if (window.confirm("Tem certeza que deseja excluir este anúncio?")) {
+            try {
+                const response = await api.delete(`/announcement/${id}`);
+                if (response.status === 200) {
+                    alert("Anúncio deletado com sucesso.");
+                    navigate("/");
+                } else {
+                    alert("Erro ao deletar o anúncio.");
+                }
+            } catch (error) {
+                console.error("Erro ao deletar o anúncio:", error);
+                alert("Erro ao deletar o anúncio. Por favor, tente novamente.");
+            }
+        }
     }
     function handleCategoria(id: string) {
         const filterRequest: FilterRequest = {
@@ -170,15 +217,33 @@ function VisualizarAnuncio() {
 
     return (
         <main className="main-layout">
-            <div className="flex justify-start ml-6 mb-6">
-                <div className="flex justify-start md:order-2">
-                    <button
-                        className="text-red-500 text-xl"
-                        onClick={toggleFavorite}
-                    >
-                        <FontAwesomeIcon icon={isFavorite ? faHeart : faHeartCrack} />
-                    </button>
-                </div>
+            <div className="flex justify-between">
+              <div className="ml-6 mb-6">
+                <button
+                    className="text-red-500 text-xl"
+                    onClick={toggleFavorite}
+                >
+                    <FontAwesomeIcon icon={isFavorite ? faHeart : faHeartCrack} />
+                </button>
+              </div>
+              <div className="flex justify-end mb-6">
+                  {ad.author.email === userEmail && (
+                      <button
+                          className="mr-4 bottom-4 bg-green-500 text-white px-4 py-1 rounded-xl hover:bg-green-700"
+                          onClick={handleEdit}
+                      >
+                          <FontAwesomeIcon icon={faEdit}/>
+                      </button>
+                  )}
+                  {ad.author.email === userEmail && (
+                      <button
+                          className="bottom-4 bg-red-500 text-white px-4 py-1 rounded-xl hover:bg-red-700"
+                          onClick={handleDelete}
+                      >
+                          <FontAwesomeIcon icon={faTrash} />
+                      </button>
+                  )}
+              </div>
             </div>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <div className="grid grid-cols-2 text-sm md:order-2">
@@ -274,11 +339,14 @@ function VisualizarAnuncio() {
                         </div>
                     </div>
                     <div className="flex justify-end mx-8 col-start-2 col-end-2">
-                        <button className="bg-blue-500 px-4 py-1 rounded-xl text-white
-                                            hover:bg-blue-800
-                        ">
-                            Contatar
-                        </button>
+                        {ad.author.email != getEmail() &&
+                            <button className="bg-blue-500 px-4 py-1 rounded-xl text-white
+                                            hover:bg-blue-800"
+                                    onClick={handleCreateChat}
+                            >
+                                Contatar
+                            </button>
+                        }
                     </div>
                 </div>
                 <div className="flex md:justify-end md:order-2 md:col-span-2">
