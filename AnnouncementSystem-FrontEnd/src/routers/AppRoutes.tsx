@@ -8,7 +8,7 @@ import {
     pathHome,
     pathLogin,
     pathMeusAnuncios,
-    pathPerfil, pathVisualizarAnuncio, pathVizualizarAnunciante
+    pathPerfil, pathVisualizarAnuncio, pathVizualizarAnunciante, pathEditarAnuncio
 } from "./Paths.tsx";
 import {Login} from "../pages/login/Login.tsx";
 import {Home} from "../pages/home/Home.tsx";
@@ -20,6 +20,7 @@ import MeusAnuncios from "../pages/anuncio/MeusAnuncios.tsx";
 import Anuncios from "../pages/anuncio/Anuncios.tsx";
 import Anunciante from "../pages/perfil/Anunciante.tsx";
 import VisualizarAnuncio from "../pages/anuncio/VisualizarAnuncio.tsx";
+import { EditarAnuncio } from "../pages/anuncio/EditarAnuncio.tsx";
 import Assessment from "../pages/assessment/Assessment.tsx";
 
 const ProtectedRoute = () => {
@@ -70,6 +71,10 @@ const router = createBrowserRouter([
                 {
                     path: pathVisualizarAnuncio,
                     element: <VisualizarAnuncio/>
+                },
+                {
+                    path: pathEditarAnuncio,
+                    element: <EditarAnuncio/>
                 },
                 {
                     path: pathVizualizarAnunciante,

@@ -3,7 +3,7 @@ import {useEffect, useState} from "react";
 import {Ad, AdSchema, FilterRequest} from "../../schema/AdSchema.tsx";
 import api from "../../services/api.tsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faStarHalfStroke, faTag} from "@fortawesome/free-solid-svg-icons";
+import {faStarHalfStroke, faTag, faEdit, faTrash} from "@fortawesome/free-solid-svg-icons";
 import {getDownloadURL, listAll, ref} from "firebase/storage";
 import {storage} from "../../services/firebaseConfig.tsx";
 import {pathCommunication, pathFilterAd, setPathVizualizarAnunciante} from "../../routers/Paths.tsx";
@@ -18,9 +18,10 @@ function VisualizarAnuncio() {
     const [imgPerfil, setImgPerfil] = useState<string>('/images/img-padrao.PNG');
     const [images, setImagens] = useState<string[]>([]);
     const defaultImage = "/images/img-padrao.PNG";
-    const navigate = useNavigate();
     const [selectedImage, setSelectedImage] = useState<string>(defaultImage);
     const [currentIndex, setCurrentIndex] = useState(0);
+    const navigate = useNavigate();
+    const userEmail = getEmail();
 
     function handleCreateChat() {
 
@@ -60,6 +61,29 @@ function VisualizarAnuncio() {
             });
         }
         else console.log("Erro ao acessar o página do anunciante.")
+    }
+    function handleEdit() {
+        if (ad && ad.author.email === userEmail) {
+            navigate(`/anuncio/editar/${ad.id}`);
+        } else {
+            console.log("Você não pode editar este anúncio.");
+        }
+    }
+    async function handleDelete() {
+        if (window.confirm("Tem certeza que deseja excluir este anúncio?")) {
+            try {
+                const response = await api.delete(`/announcement/${id}`);
+                if (response.status === 200) {
+                    alert("Anúncio deletado com sucesso.");
+                    navigate("/");
+                } else {
+                    alert("Erro ao deletar o anúncio.");
+                }
+            } catch (error) {
+                console.error("Erro ao deletar o anúncio:", error);
+                alert("Erro ao deletar o anúncio. Por favor, tente novamente.");
+            }
+        }
     }
     function handleCategoria(id: string) {
         const filterRequest: FilterRequest = {
@@ -167,6 +191,24 @@ function VisualizarAnuncio() {
 
     return (
         <main className="main-layout">
+            <div className="flex justify-end mb-6">
+                {ad.author.email === userEmail && (
+                    <button
+                        className="mr-4 bottom-4 bg-green-500 text-white px-4 py-1 rounded-xl hover:bg-green-700"
+                        onClick={handleEdit}
+                    >
+                        <FontAwesomeIcon icon={faEdit}/>
+                    </button>
+                )}
+                {ad.author.email === userEmail && (
+                    <button
+                        className="bottom-4 bg-red-500 text-white px-4 py-1 rounded-xl hover:bg-red-700"
+                        onClick={handleDelete}
+                    >
+                        <FontAwesomeIcon icon={faTrash} />
+                    </button>
+                )}
+            </div>
             <div className="grid grid-cols-1 gap-3 md:grid-cols-2">
                 <div className="grid grid-cols-2 text-sm md:order-2">
                     <div>{ad.city.name}</div>
@@ -276,7 +318,7 @@ function VisualizarAnuncio() {
                         {ad.categories.map((category, index) => (
                             <div key={index} onClick={() => handleCategoria(category.id)}>
                                 <span className="inline-block bg-blue-200 text-blue-800 px-3 py-1 me-1 rounded-full hover:cursor-pointer hover:bg-blue-400 hover:text-white">
-                                  <FontAwesomeIcon icon={faTag}/> {category?.name}
+                                    <FontAwesomeIcon icon={faTag}/> {category?.name}
                                 </span>
                             </div>
                         ))}
