@@ -6,7 +6,7 @@ import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faStarHalfStroke} from "@fortawesome/free-solid-svg-icons";
 import {Ad, PaginatedAdsSchema} from "../../schema/AdSchema.tsx";
 import SmallAdCard from "../../components/cards/SmallAdCards.tsx";
-import {useEffect, useState} from 'react';
+import {useCallback, useEffect, useRef, useState} from 'react';
 import {AssessmentSchema, PaginatedAssessmentsSchema} from "../../schema/AssessmentSchema.tsx";
 import SmallAssessmentCard from "../../components/cards/SmallAssessmentCard.tsx";
 import {formatScore} from "../../utils/formatScore.tsx";
@@ -37,6 +37,36 @@ function Perfil() {
     const [pageAd, setPageAd] = useState<number>(0);
     const [totalPagesAd, setTotalPagesAd] = useState<number>(0);
 
+    const adsContainerRefAd = useRef<HTMLDivElement | null>(null);
+    const observerRefAd = useRef<IntersectionObserver | null>(null);
+
+    const loadMoreAds = useCallback(() => {
+        if (pageAd + 1 < totalPagesAd) {
+            setPageAd((prevPage) => prevPage + 1);
+        }
+    }, [pageAd, totalPagesAd]);
+
+    useEffect(() => {
+        const observerCallback: IntersectionObserverCallback = (entries) => {
+            if (entries[0].isIntersecting) {
+                loadMoreAds();
+            }
+        };
+
+        if (adsContainerRefAd.current) {
+            observerRefAd.current = new IntersectionObserver(observerCallback, {
+                root: adsContainerRefAd.current,
+                rootMargin: "0px",
+                threshold: 1.0,
+            });
+
+            const sentinel = document.getElementById("ads-sentinel");
+            if (sentinel) observerRefAd.current.observe(sentinel);
+        }
+
+        return () => observerRefAd.current?.disconnect();
+    }, [loadMoreAds]);
+
     const fetchMyAds = async (email: string) => {
         try {
             if(pageAd == 0 || pageAd > totalPagesAd){
@@ -60,6 +90,36 @@ function Perfil() {
     const [favorites, setFavorites] = useState<Ad[]>([])
     const [pageFav, setPageFav] = useState<number>(0)
     const [totalPagesFav, setTotalPagesFav] = useState<number>(0)
+
+    const adsContainerRefFav = useRef<HTMLDivElement | null>(null);
+    const observerRefFav = useRef<IntersectionObserver | null>(null);
+
+    const loadMoreFav = useCallback(() => {
+        if (pageFav + 1 < totalPagesFav) {
+            setPageFav((prevPage) => prevPage + 1);
+        }
+    }, [pageFav, totalPagesFav]);
+
+    useEffect(() => {
+        const observerCallback: IntersectionObserverCallback = (entries) => {
+            if (entries[0].isIntersecting) {
+                loadMoreFav();
+            }
+        };
+
+        if (adsContainerRefFav.current) {
+            observerRefFav.current = new IntersectionObserver(observerCallback, {
+                root: adsContainerRefFav.current,
+                rootMargin: "0px",
+                threshold: 1.0,
+            });
+
+            const sentinel = document.getElementById("fav-sentinel");
+            if (sentinel) observerRefFav.current.observe(sentinel);
+        }
+
+        return () => observerRefFav.current?.disconnect();
+    }, [loadMoreFav]);
 
     const fetchMyFavorites = async () => {
         try {
@@ -85,6 +145,36 @@ function Perfil() {
     const [pageReviews, setPageReviews] = useState<number>(0)
     const [totalPagesReviews, setTotalPagesReviews] = useState<number>(0)
 
+    const adsContainerRefReviews = useRef<HTMLDivElement | null>(null);
+    const observerRefReviews = useRef<IntersectionObserver | null>(null);
+
+    const loadMoreReviews = useCallback(() => {
+        if (pageReviews + 1 < totalPagesReviews) {
+            setPageReviews((prevPage) => prevPage + 1);
+        }
+    }, [pageReviews, totalPagesReviews]);
+
+    useEffect(() => {
+        const observerCallback: IntersectionObserverCallback = (entries) => {
+            if (entries[0].isIntersecting) {
+                loadMoreReviews();
+            }
+        };
+
+        if (adsContainerRefReviews.current) {
+            observerRefReviews.current = new IntersectionObserver(observerCallback, {
+                root: adsContainerRefReviews.current,
+                rootMargin: "0px",
+                threshold: 1.0,
+            });
+
+            const sentinel = document.getElementById("rev-sentinel");
+            if (sentinel) observerRefReviews.current.observe(sentinel);
+        }
+
+        return () => observerRefReviews.current?.disconnect();
+    }, [loadMoreReviews]);
+
     const fetchMyReviews = async () => {
         try {
             if(pageReviews == 0 || pageReviews > totalPagesReviews){
@@ -109,6 +199,36 @@ function Perfil() {
     const [pageAssessments, setPageAssessments] = useState<number>(0)
     const [totalPagesAssessments, setTotalPagesAssessments] = useState<number>(0)
 
+    const adsContainerRefAss = useRef<HTMLDivElement | null>(null);
+    const observerRefAss = useRef<IntersectionObserver | null>(null);
+
+    const loadMoreAss = useCallback(() => {
+        if (pageAssessments + 1 < totalPagesAssessments) {
+            setPageAssessments((prevPage) => prevPage + 1);
+        }
+    }, [pageAssessments, totalPagesAssessments]);
+
+    useEffect(() => {
+        const observerCallback: IntersectionObserverCallback = (entries) => {
+            if (entries[0].isIntersecting) {
+                loadMoreAss();
+            }
+        };
+
+        if (adsContainerRefAss.current) {
+            observerRefAss.current = new IntersectionObserver(observerCallback, {
+                root: adsContainerRefAss.current,
+                rootMargin: "0px",
+                threshold: 1.0,
+            });
+
+            const sentinel = document.getElementById("ass-sentinel");
+            if (sentinel) observerRefAss.current.observe(sentinel);
+        }
+
+        return () => observerRefAss.current?.disconnect();
+    }, [loadMoreAss]);
+
     const fetchMyAssessment = async () => {
         try {
             if(pageAssessments == 0 || pageAssessments > totalPagesAssessments){
@@ -116,7 +236,7 @@ function Perfil() {
                 setPageAssessments(0)
                 setTotalPagesAssessments(0)
             }
-            const response = await api.get(`/assessment/assessments?page=${pageAssessments}&size=3`);
+            const response = await api.get(`/assessment/assessments/${email}?page=${pageAssessments}&size=3`);
             const parsed = PaginatedAssessmentsSchema.safeParse(response.data);
             if (parsed.success) {
                 setAssessments((prevAds) => [...prevAds, ...parsed.data.content]);
@@ -130,7 +250,7 @@ function Perfil() {
     };
 
     useEffect(() => {
-        fetchUser();
+        fetchUser()
     }, [email]);
 
     useEffect(() => {
@@ -174,13 +294,15 @@ function Perfil() {
                         <div className="flex flex-col gap-1">
                             <div className="text-lg font-semibold">Anúncios</div>
                             <div className="flex gap-2 overflow-y-auto pb-2"
+                                 ref={adsContainerRefAd}
+
                             >
                                 {ads.length > 0 ? (
                                     <>
                                         {ads.map((ad) => (
-                                            <SmallAdCard ad={ad} key={ad.id} />
+                                            <SmallAdCard ad={ad} key={ad.id}/>
                                         ))}
-                                        <div>Final da Lista</div>
+                                        <div id="ads-sentinel" className="h-2 w-full"></div>
                                     </>
                                 ) : (
                                     <div className="text-center w-full italic text-gray-700">Nenhum Anúncio</div>
@@ -191,30 +313,33 @@ function Perfil() {
                             <div className="flex flex-col gap-1">
                                 <div className="text-lg font-semibold">Meus Favoritos</div>
                                 <div className="flex gap-2 overflow-y-auto pb-2"
+                                     ref={adsContainerRefFav}
                                 >
                                     {favorites.length > 0 ? (
                                         <>
                                             {favorites.map((ad) => (
-                                                <SmallAdCard ad={ad} key={ad.id} />
+                                                <SmallAdCard ad={ad} key={ad.id}/>
                                             ))}
-                                            <div>Final da Lista</div>
+                                            <div id="fav-sentinel" className="h-2 w-full"></div>
                                         </>
                                     ) : (
-                                        <div className="text-center w-full italic text-gray-700">Lista de Favorito Vazia</div>
+                                        <div className="text-center w-full italic text-gray-700">Lista de Favorito
+                                            Vazia</div>
                                     )}
                                 </div>
                             </div>
                         )}
                         <div className="flex flex-col gap-1">
-                            <div className="text-lg font-semibold">Avaliações</div>
+                            <div className="text-lg font-semibold">Avaliações Recebidas</div>
                             <div className="flex gap-2 overflow-y-auto pb-2"
+                                 ref={adsContainerRefAss}
                             >
                                 {assessments.length > 0 ? (
                                     <>
                                         {assessments.map((assessment) => (
                                             <SmallAssessmentCard assessment={assessment} key={assessment.id}/>
                                         ))}
-                                        <div>Final da Lista</div>
+                                        <div id="ass-sentinel" className="h-2 w-full"></div>
                                     </>
                                 ) : (
                                     <div className="text-center w-full italic text-gray-700">Nenhuma Avaliação</div>
@@ -225,16 +350,18 @@ function Perfil() {
                             <div className="flex flex-col gap-1">
                                 <div className="text-lg font-semibold">Minhas Avaliações</div>
                                 <div className="flex gap-2 overflow-y-auto pb-2"
+                                     ref={adsContainerRefReviews}
                                 >
                                     {myReviews.length > 0 ? (
                                         <>
                                             {myReviews.map((review) => (
                                                 <SmallAssessmentCard assessment={review} key={review.id}/>
                                             ))}
-                                            <div>Final da Lista</div>
+                                            <div id="rev-sentinel" className="h-2 w-full"></div>
                                         </>
                                     ) : (
-                                        <div className="text-center w-full italic text-gray-700">Nenhuma Avaliação Feita</div>
+                                        <div className="text-center w-full italic text-gray-700">Nenhuma Avaliação
+                                            Feita</div>
                                     )}
                                 </div>
                             </div>
