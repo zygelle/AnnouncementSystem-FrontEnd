@@ -8,6 +8,7 @@ import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faArrowRight, faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
 import {pathAssessment, setPathVisualizarAnuncio, setPathVizualizarAnunciante} from "../../routers/Paths.tsx";
 import { useNavigate } from "react-router-dom";
+import {formatDateChat} from "../../utils/formatDateChat.tsx";
 
 interface TalkCardProps {
     chat: Chat;
@@ -91,22 +92,6 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat, setChat, removeChatById, add
             messageEndRef.current.scrollIntoView({ behavior: "smooth" });
         }
     }, [messages]);
-
-    const formatDate = (dateString: string) => {
-        const messageDate = new Date(dateString);
-        const now = new Date();
-        const diffTime = now.getTime() - messageDate.getTime();
-        const diffDays = Math.floor(diffTime / (1000 * 3600 * 24));
-
-        if (diffDays === 0) {
-            return `Hoje, ${messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-        } else if (diffDays === 1) {
-            return `Ontem, ${messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-        } else {
-            return messageDate.toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' }) + ", " +
-                messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
-    };
 
     const handleNavigateAnnouncement = () => {
         navigate(setPathVisualizarAnuncio(chat.announcement.id));
@@ -216,7 +201,7 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat, setChat, removeChatById, add
                                         }`}
                                     >
                                         <div>{message.message}</div>
-                                        <div className="text-xs text-blue-950 mt-1">{formatDate(message.date)}</div>
+                                        <div className="text-xs text-blue-950 mt-1">{formatDateChat(message.date)}</div>
                                     </div>
                                 </div>
                             ))}

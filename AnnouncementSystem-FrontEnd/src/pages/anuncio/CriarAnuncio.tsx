@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import PhotoUpload from '../../../components/photoUpload/PhotoUpload';
+import PhotoUpload from '../../components/PhotoUpload.tsx';
 import Select from "react-select";
-import {Category, CategorySchema, City, CitySchema } from "../../../schema/AdSchema";
-import api from '../../../services/api';
+import {Category, CategorySchema, City, CitySchema } from "../../schema/AdSchema.tsx";
+import api from '../../services/api.tsx';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { v4 } from 'uuid';
-import { pathHome, setPathVisualizarAnuncio } from "../../../routers/Paths";
-import { AdSchema, createAd, createAdSchema } from "../../../schema/AdSchema";
+import { pathHome, setPathVisualizarAnuncio } from "../../routers/Paths.tsx";
+import { AdSchema, createAd, createAdSchema } from "../../schema/AdSchema.tsx";
 import { useForm } from "react-hook-form";
-import { storage } from '../../../services/firebaseConfig';
+import { storage } from '../../services/firebaseConfig.tsx';
 import { ref, uploadBytesResumable } from "firebase/storage";
 
 export function CriarAnuncio(){

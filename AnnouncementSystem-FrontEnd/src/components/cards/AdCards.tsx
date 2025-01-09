@@ -6,6 +6,7 @@ import {getDownloadURL, listAll, ref} from "firebase/storage";
 import {storage} from "../../services/firebaseConfig.tsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faTag} from "@fortawesome/free-solid-svg-icons";
+import {formatDateSimple} from "../../utils/formatDateSimple.tsx";
 
 interface OptionAdCardsProps {
     ad: Ad;
@@ -13,14 +14,6 @@ interface OptionAdCardsProps {
 
 const AdCardsOptional: React.FC<OptionAdCardsProps> = ({ ad }) => {
 
-    const formatDate = (date: string) => {
-        const options: Intl.DateTimeFormatOptions = {
-            day: '2-digit',
-            month: 'long',
-            year: 'numeric'
-        };
-        return new Date(date).toLocaleDateString('pt-BR', options);
-    };
     const [imageSrc, setImageSrc] = useState('/images/img-padrao.PNG');
     const navigate = useNavigate();
 
@@ -56,7 +49,7 @@ const AdCardsOptional: React.FC<OptionAdCardsProps> = ({ ad }) => {
         " onClick={handleNavigate}>
             <div className="grid grid-cols-2 col-span-2 md:order-2">
                 <div>{ad.city.name}</div>
-                <div className="text-end text-sm">{formatDate(ad.date)}</div>
+                <div className="text-end text-sm">{formatDateSimple(ad.date)}</div>
             </div>
             <div className="justify-items-center content-center md:row-span-5 md:order-1 md:pe-1">
                 <div className="flex justify-center items-center overflow-hidden h-40 md:h-48 md:rounded-3xl lg:40">

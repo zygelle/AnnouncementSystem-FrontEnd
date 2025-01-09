@@ -2,8 +2,6 @@ import {getEmail} from "../../services/token.tsx";
 import {useLocation} from "react-router-dom";
 import api from "../../services/api.tsx";
 import {userSchema, User} from "../../schema/UserSchema.tsx";
-import {getDownloadURL, ref} from "firebase/storage";
-import {storage} from "../../services/firebaseConfig.tsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faStarHalfStroke} from "@fortawesome/free-solid-svg-icons";
 import {Ad, PaginatedAdsSchema} from "../../schema/AdSchema.tsx";
@@ -11,6 +9,8 @@ import SmallAdCard from "../../components/cards/SmallAdCards.tsx";
 import {useEffect, useState} from 'react';
 import {AssessmentSchema, PaginatedAssessmentsSchema} from "../../schema/AssessmentSchema.tsx";
 import SmallAssessmentCard from "../../components/cards/SmallAssessmentCard.tsx";
+import {formatScore} from "../../utils/formatScore.tsx";
+import {fetchImgPerfil} from "../../utils/fetchImgPerfil.tsx";
 
 function Perfil() {
     const location = useLocation();
@@ -18,31 +18,19 @@ function Perfil() {
     const [user, setUser] = useState<User | undefined>();
     const [imgPerfil, setImgPerfil] = useState<string>('/images/img-padrao.PNG');
 
-    const formatScore = (score: number) => {
-        return score.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-    };
-
     const fetchUser = async () => {
         try {
             const response = await api.get(`/user/${email}`);
             const validate = userSchema.safeParse(response.data);
             if (validate.success) {
                 setUser(validate.data);
-                fetchImgPerfil(validate.data.icon);
+                fetchImgPerfil(validate.data.icon, setImgPerfil);
             } else {
                 console.log("Erro ao validar usuário: " + validate.error);
             }
         } catch (error) {
             console.error("Erro ao buscar usuário: " + error);
         }
-    };
-
-    const fetchImgPerfil = (img: string | null | undefined) => {
-        if (!img) return;
-        const imageRef = ref(storage, img);
-        getDownloadURL(imageRef)
-            .then((url) => setImgPerfil(url))
-            .catch((error) => console.error("Erro ao buscar a imagem:", error));
     };
 
     const [ads, setAds] = useState<Ad[]>([]);
@@ -195,7 +183,7 @@ function Perfil() {
                                         <div>Final da Lista</div>
                                     </>
                                 ) : (
-                                    <div>Nenhum Anúncio</div>
+                                    <div className="text-center w-full italic text-gray-700">Nenhum Anúncio</div>
                                 )}
                             </div>
                         </div>
@@ -212,7 +200,7 @@ function Perfil() {
                                             <div>Final da Lista</div>
                                         </>
                                     ) : (
-                                        <div>Lista de Favorito Vazia</div>
+                                        <div className="text-center w-full italic text-gray-700">Lista de Favorito Vazia</div>
                                     )}
                                 </div>
                             </div>
@@ -229,7 +217,7 @@ function Perfil() {
                                         <div>Final da Lista</div>
                                     </>
                                 ) : (
-                                    <div>Nenhuma Avaliação</div>
+                                    <div className="text-center w-full italic text-gray-700">Nenhuma Avaliação</div>
                                 )}
                             </div>
                         </div>
@@ -246,7 +234,7 @@ function Perfil() {
                                             <div>Final da Lista</div>
                                         </>
                                     ) : (
-                                        <div>Nenhuma Avaliação Feita</div>
+                                        <div className="text-center w-full italic text-gray-700">Nenhuma Avaliação Feita</div>
                                     )}
                                 </div>
                             </div>

@@ -6,6 +6,7 @@ import {getDownloadURL, listAll, ref} from "firebase/storage";
 import {storage} from "../../services/firebaseConfig.tsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faTag} from "@fortawesome/free-solid-svg-icons";
+import {formatDateSimple} from "../../utils/formatDateSimple.tsx";
 
 interface OptionSmallAdCardProps {
     ad: Ad;
@@ -19,15 +20,6 @@ const SmallAdCard: React.FC<OptionSmallAdCardProps> = ({ ad }) => {
     useEffect(() => {
         fetchImages(ad.imageArchive)
     }, []);
-
-    const formatDate = (date: string) => {
-        const options: Intl.DateTimeFormatOptions = {
-            day: '2-digit',
-            month: 'long',
-            year: 'numeric'
-        };
-        return new Date(date).toLocaleDateString('pt-BR', options);
-    };
 
     const fetchImages = (id: string | null | undefined) => {
         if (!ad.imageArchive) {
@@ -57,7 +49,7 @@ const SmallAdCard: React.FC<OptionSmallAdCardProps> = ({ ad }) => {
         " onClick={handleNavigate}>
             <div className="grid grid-cols-2 col-span-2">
                 <div className="text-xs">{ad.city.name}</div>
-                <div className="text-end text-xs">{formatDate(ad.date)}</div>
+                <div className="text-end text-xs">{formatDateSimple(ad.date)}</div>
             </div>
             <div className="justify-items-center content-center">
                 <div className="flex justify-center items-center overflow-hidden h-40">

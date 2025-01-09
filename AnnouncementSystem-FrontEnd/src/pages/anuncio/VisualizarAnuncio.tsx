@@ -9,6 +9,9 @@ import {storage} from "../../services/firebaseConfig.tsx";
 import {pathCommunication, pathFilterAd, setPathVizualizarAnunciante} from "../../routers/Paths.tsx";
 import {getEmail} from "../../services/token.tsx";
 import {chatSchema} from "../../schema/ChatSchema.tsx";
+import {formatDate} from "../../utils/formatDate.tsx";
+import {formatScore} from "../../utils/formatScore.tsx";
+import {fetchImgPerfil} from "../../utils/fetchImgPerfil.tsx";
 
 function VisualizarAnuncio() {
 
@@ -106,22 +109,6 @@ function VisualizarAnuncio() {
 
     const visibleImages = images.slice(currentIndex, currentIndex + 3);
 
-    const formatDate = (date: string) => {
-        const options: Intl.DateTimeFormatOptions = {
-            day: '2-digit',
-            month: 'long',
-            year: 'numeric',
-            hour: '2-digit',
-            minute: '2-digit',
-            hour12: false
-        };
-
-        return new Date(date).toLocaleDateString('pt-BR', options);
-    };
-    const formatScore = (score: number) => {
-        return score.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
-    };
-
     const fetchImages = (nomeArquivo: string | null | undefined) => {
         if(!nomeArquivo){
             return
@@ -144,17 +131,7 @@ function VisualizarAnuncio() {
                 console.error("Erro ao buscar as imagens:", error);
             });
     };
-    const fetchImgPerfil = (img: string | null | undefined) => {
-        if (!img) {
-            return;
-        }
-        const imageRef = ref(storage, img);
-        getDownloadURL(imageRef).then((url) => {
-            setImgPerfil(url);
-        }).catch(error => {
-            console.error("Erro ao buscar a imagem:", error);
-        });
-    };
+
     async function fetchAd() {
         try {
             const response = await api.get(`/announcement/${id}`);
@@ -172,7 +149,7 @@ function VisualizarAnuncio() {
                 throw new Error('Dados inválidos recebidos');
             }
             setAd(parsedResult.data);
-            fetchImgPerfil(parsedResult.data.author.icon)
+            fetchImgPerfil(parsedResult.data.author.icon, setImgPerfil)
             fetchImages(parsedResult.data.imageArchive)
         } catch (error: unknown) {
             if (error instanceof Error) {

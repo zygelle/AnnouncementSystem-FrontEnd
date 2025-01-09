@@ -2,6 +2,7 @@ import React from "react";
 import {AssessmentSchema} from "../../schema/AssessmentSchema.tsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faStarHalfStroke} from "@fortawesome/free-solid-svg-icons";
+import {formatScore} from "../../utils/formatScore.tsx";
 
 interface SmallAssessmentCardProps {
     assessment: AssessmentSchema;
@@ -16,9 +17,6 @@ const SmallAssessmentCard: React.FC<SmallAssessmentCardProps> = ({ assessment })
             year: 'numeric'
         };
         return new Date(date).toLocaleDateString('pt-BR', options);
-    };
-    const formatScore = (score: number) => {
-        return score.toLocaleString('pt-BR', { minimumFractionDigits: 1, maximumFractionDigits: 1 });
     };
 
     return (
