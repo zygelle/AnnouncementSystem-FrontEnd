@@ -196,17 +196,19 @@ function VisualizarAnuncio() {
         <main className="main-layout">
             <div className="flex justify-between">
               <div className="ml-6 mb-6">
-                <button
-                    className="text-red-500 text-xl"
-                    onClick={toggleFavorite}
-                >
-                    <FontAwesomeIcon icon={isFavorite ? faHeart : faHeartCrack} />
-                </button>
-              </div>
-              <div className="flex justify-end mb-6">
-                  {ad.author.email === userEmail && (
+                  {ad.author.email != userEmail &&
                       <button
-                          className="mr-4 bottom-4 bg-green-500 text-white px-4 py-1 rounded-xl hover:bg-green-700"
+                          className="text-red-500 text-xl"
+                          onClick={toggleFavorite}
+                      >
+                          <FontAwesomeIcon icon={isFavorite ? faHeart : faHeartCrack}/>
+                      </button>
+                  }
+              </div>
+                <div className="flex justify-end mb-6">
+                    {ad.author.email === userEmail && (
+                        <button
+                            className="mr-4 bottom-4 bg-green-500 text-white px-4 py-1 rounded-xl hover:bg-green-700"
                           onClick={handleEdit}
                       >
                           <FontAwesomeIcon icon={faEdit}/>
