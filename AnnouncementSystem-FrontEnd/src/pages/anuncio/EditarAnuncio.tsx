@@ -1,6 +1,6 @@
 import { useEffect, useState } from "react";
 import { useNavigate, useParams } from "react-router-dom";
-import PhotoUpload from '../../components/photoUpload/PhotoUpload';
+import PhotoUpload from '../../components/PhotoUpload.tsx';
 import Select from "react-select";
 import { Category, CategorySchema, City, CitySchema } from "../../schema/AdSchema";
 import api from '../../services/api';

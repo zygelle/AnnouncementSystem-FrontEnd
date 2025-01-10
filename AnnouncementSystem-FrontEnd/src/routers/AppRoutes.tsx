@@ -12,13 +12,12 @@ import {
 } from "./Paths.tsx";
 import {Login} from "../pages/login/Login.tsx";
 import {Home} from "../pages/home/Home.tsx";
-import {CriarAnuncio} from "../pages/anuncio/criar/CriarAnuncio.tsx";
+import {CriarAnuncio} from "../pages/anuncio/CriarAnuncio.tsx";
 import Navbar from "../components/Navbar.tsx";
 import Communication from "../pages/communication/Communication.tsx";
 import Perfil from "../pages/perfil/Perfil.tsx";
 import MeusAnuncios from "../pages/anuncio/MeusAnuncios.tsx";
 import Anuncios from "../pages/anuncio/Anuncios.tsx";
-import Anunciante from "../pages/perfil/Anunciante.tsx";
 import VisualizarAnuncio from "../pages/anuncio/VisualizarAnuncio.tsx";
 import { EditarAnuncio } from "../pages/anuncio/EditarAnuncio.tsx";
 import Assessment from "../pages/assessment/Assessment.tsx";
@@ -78,7 +77,7 @@ const router = createBrowserRouter([
                 },
                 {
                     path: pathVizualizarAnunciante,
-                    element: <Anunciante />
+                    element: <Perfil />
                 },
                 {
                     path: pathAssessment,

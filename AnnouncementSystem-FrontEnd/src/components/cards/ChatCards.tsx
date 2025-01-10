@@ -2,6 +2,7 @@ import {Chat} from "../../schema/ChatSchema.tsx";
 import React, {useEffect, useState} from "react";
 import {getDownloadURL, listAll, ref} from "firebase/storage";
 import {storage} from "../../services/firebaseConfig.tsx";
+import {formatDateChat} from "../../utils/formatDateChat.tsx";
 
 interface ChatCardProps {
     chat: Chat;
@@ -9,22 +10,6 @@ interface ChatCardProps {
 }
 
 const ChatCards: React.FC<ChatCardProps> = ({chat, setSelectChat})=> {
-
-    const formatDate = (dateString: string) => {
-        const messageDate = new Date(dateString);
-        const now = new Date();
-        const diffTime = now.getTime() - messageDate.getTime();
-        const diffDays = Math.floor(diffTime / (1000 * 3600 * 24));
-
-        if (diffDays === 0) {
-            return `Hoje, ${messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-        } else if (diffDays === 1) {
-            return `Ontem, ${messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}`;
-        } else {
-            return messageDate.toLocaleDateString([], { year: 'numeric', month: 'short', day: 'numeric' }) + ", " +
-                messageDate.toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' });
-        }
-    };
 
     const [imageSrc, setImageSrc] = useState('/images/img-padrao.PNG');
 
@@ -67,7 +52,7 @@ const ChatCards: React.FC<ChatCardProps> = ({chat, setSelectChat})=> {
             </div>
             {chat.dateLastMessage && (
                 <div className="text-xs text-gray-500 text-end">
-                    {formatDate(chat.dateLastMessage)}
+                    {formatDateChat(chat.dateLastMessage)}
                 </div>
             )}
         </div>

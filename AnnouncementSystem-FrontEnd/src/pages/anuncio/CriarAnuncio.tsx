@@ -1,15 +1,15 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import PhotoUpload from '../../../components/photoUpload/PhotoUpload';
+import PhotoUpload from '../../components/PhotoUpload.tsx';
 import Select from "react-select";
-import {Category, CategorySchema, City, CitySchema } from "../../../schema/AdSchema";
-import api from '../../../services/api';
+import {Category, CategorySchema, City, CitySchema } from "../../schema/AdSchema.tsx";
+import api from '../../services/api.tsx';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { v4 } from 'uuid';
-import { pathHome, setPathVisualizarAnuncio } from "../../../routers/Paths";
-import { AdSchema, createAd, createAdSchema } from "../../../schema/AdSchema";
+import { pathHome, setPathVisualizarAnuncio } from "../../routers/Paths.tsx";
+import { AdSchema, createAd, createAdSchema } from "../../schema/AdSchema.tsx";
 import { useForm } from "react-hook-form";
-import { storage } from '../../../services/firebaseConfig';
+import { storage } from '../../services/firebaseConfig.tsx';
 import { ref, uploadBytesResumable } from "firebase/storage";
 
 export function CriarAnuncio(){
@@ -149,16 +149,16 @@ export function CriarAnuncio(){
     return (
         <main>
             <div className="flex flex-colitems-center justify-center">
-                <div className="w-full flex flex-col p-8 rounded-lg shadow-2x">
+                <div className="w-full flex flex-col p-2 rounded-lg shadow-2x">
                     <div className="flex flex-col items-center mb-6">
                         <PhotoUpload
                             Images={setImages}
                             isImages={setIsImages}
                         />
                     </div>
-                    <div className="gap-2.5 mt-5 max-w-full">
+                    <div className="gap-2.5 mt-2 max-w-full">
                         <form onSubmit={handleSubmit(criar)} className="grid grid-cols-2 gap-6">
-                            <div className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-4 col-span-2 md:col-span-1">
                                 <div>
                                     <label className="mb-2">Título</label>
                                     <input
@@ -187,11 +187,12 @@ export function CriarAnuncio(){
                                         }}
                                         className="input"
                                         placeholder="Selecione a cidade"
+                                        menuPosition="fixed"
                                     />
                                     {errors.city && <span className='text-red-600'>{errors.city.message}</span>}
                                 </div>
                             </div>
-                            <div className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-4 col-span-2 md:col-span-1">
                                 <div>
                                     <label className="mb-2">Categorias</label>
                                     <Select
