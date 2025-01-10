@@ -98,7 +98,9 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat, setChat, removeChatById, add
     };
 
     const handleToAssess = () => {
-        navigate(pathAssessment)
+        navigate(pathAssessment, {
+            state: { idChat: chat.id }
+        })
     }
 
     const handleAuthor = () => {

@@ -1,6 +1,15 @@
 import { z } from "zod";
 import {chatSchema} from "./ChatSchema.tsx";
 
+export const createAssessmentSchema = z.object({
+    title: z.string().min(1),
+    description: z.string().min(1),
+    grade: z.number().min(0),
+    chat: z.string().uuid(),
+});
+
+export type CreateAssessment = z.infer<typeof createAssessmentSchema>;
+
 export const userBasicSchema = z.object({
     email: z.string().email(),
     name: z.string().min(1),
