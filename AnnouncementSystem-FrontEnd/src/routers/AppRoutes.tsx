@@ -7,20 +7,20 @@ import {
     pathFilterAd,
     pathHome,
     pathLogin,
-    pathMeusAnuncios,
-    pathPerfil, pathVisualizarAnuncio, pathVizualizarAnunciante, pathEditarAnuncio
+    pathMyAnnouncement,
+    pathPerfil, pathViewAd, pathEditarAnuncio, pathViewAdvertiser
 } from "./Paths.tsx";
 import {Login} from "../pages/login/Login.tsx";
 import {CriarAnuncio} from "../pages/anuncio/CriarAnuncio.tsx";
 import Navbar from "../components/Navbar.tsx";
 import Communication from "../pages/communication/Communication.tsx";
 import Perfil from "../pages/perfil/Perfil.tsx";
-import MeusAnuncios from "../pages/anuncio/MeusAnuncios.tsx";
-import Anuncios from "../pages/anuncio/Anuncios.tsx";
+import MyAnnouncement from "../pages/anuncio/MyAnnouncement.tsx";
 import VisualizarAnuncio from "../pages/anuncio/VisualizarAnuncio.tsx";
 import { EditarAnuncio } from "../pages/anuncio/EditarAnuncio.tsx";
 import Assessment from "../pages/assessment/Assessment.tsx";
 import ErrorPage from "../pages/error/ErrorPage.tsx";
+import Announcement from "../pages/anuncio/Announcement.tsx";
 
 const ProtectedRoute = () => {
     return isAuthenticated() ? <Outlet /> : <Navigate to={pathLogin} />;
@@ -47,7 +47,7 @@ const router = createBrowserRouter([
             children:[
                 {
                     path: pathHome,
-                    element: <Anuncios />
+                    element: <Announcement />
                 },
                 {
                     path: pathCreateAds,
@@ -55,7 +55,7 @@ const router = createBrowserRouter([
                 },
                 {
                     path: pathFilterAd,
-                    element: <Anuncios/>
+                    element: <Announcement />
                 },
                 {
                     path: pathCommunication,
@@ -66,11 +66,11 @@ const router = createBrowserRouter([
                     element: <Perfil/>
                 },
                 {
-                    path: pathMeusAnuncios,
-                    element: <MeusAnuncios/>
+                    path: pathMyAnnouncement,
+                    element: <MyAnnouncement />
                 },
                 {
-                    path: pathVisualizarAnuncio,
+                    path: pathViewAd,
                     element: <VisualizarAnuncio/>
                 },
                 {
@@ -78,7 +78,7 @@ const router = createBrowserRouter([
                     element: <EditarAnuncio/>
                 },
                 {
-                    path: pathVizualizarAnunciante,
+                    path: pathViewAdvertiser,
                     element: <Perfil />
                 },
                 {

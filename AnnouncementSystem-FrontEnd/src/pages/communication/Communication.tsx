@@ -1,5 +1,5 @@
-import api from "../../services/api.tsx";
-import { useEffect, useState, useRef } from "react";
+import api from "../../services/api/api.tsx";
+import {useEffect, useState, useRef, useCallback} from "react";
 import { Chat, PaginatedChatSchema } from "../../schema/ChatSchema.tsx";
 import ChatCards from "../../components/cards/ChatCards.tsx";
 import TalkCards from "../../components/cards/TalkCards.tsx";
@@ -18,9 +18,21 @@ function Communication() {
 
     const chatListRef = useRef<HTMLDivElement>(null);
 
-    const fetchChats = async () => {
+    const handleResize = () => {
+        setIsMdOrLarger(window.innerWidth >= 768);
+    };
+
+    const addChatToStart = (newChat: Chat) => {
+        setChats((prevChats) => [newChat, ...prevChats]);
+    };
+
+    const removeChatById = (id: string) => {
+        setChats((prevChats) => prevChats.filter((chat) => chat.id !== id));
+    };
+
+    const fetchChats = useCallback(async () => {
         try {
-            const response = await api.get(`chat?page=${page}&size=12`);
+            const response = await api.get(`chat?page=${page}&size=9`);
             const parsed = PaginatedChatSchema.safeParse(response.data);
             if (parsed.success) {
                 setTotalPages(parsed.data.totalPages);
@@ -38,51 +50,43 @@ function Communication() {
         } catch (error) {
             console.error("Erro ao buscar os chats", error);
         }
-    };
+    }, [page, initialChat]);
 
-    const handleResize = () => {
-        setIsMdOrLarger(window.innerWidth >= 768);
-    };
-
-    useEffect(() => {
-        fetchChats();
-        window.addEventListener("resize", handleResize);
-        return () => window.removeEventListener("resize", handleResize);
-    }, [page]);
-
-    const handleScroll = () => {
+    const handleScroll = useCallback(() => {
         if (chatListRef.current) {
             const { scrollTop, clientHeight, scrollHeight } = chatListRef.current;
             if (scrollTop + clientHeight >= scrollHeight - 10 && page < totalPages - 1) {
                 setPage((prev) => prev + 1);
             }
         }
-    };
+    }, [page, totalPages]);
 
-    const addChatToStart = (newChat: Chat) => {
-        setChats((prevChats) => [newChat, ...prevChats]);
-    };
+    useEffect(() => {
+        fetchChats().catch((error) => {
+            console.error("Erro ao buscar chats: " + error);
+        });
 
-    const removeChatById = (id: string) => {
-        setChats((prevChats) => prevChats.filter((chat) => chat.id !== id));
-    };
+        window.addEventListener("resize", handleResize);
+        return () => window.removeEventListener("resize", handleResize);
+
+    }, [fetchChats]);
 
     useEffect(() => {
         const chatListElement = chatListRef.current;
         if (chatListElement) {
             chatListElement.addEventListener("scroll", handleScroll);
         }
+
         return () => {
             if (chatListElement) {
                 chatListElement.removeEventListener("scroll", handleScroll);
             }
         };
-    }, [page]);
+    }, [handleScroll]);
 
     return (
         <main className="h-full">
             <div className="grid grid-cols-1 md:grid-cols-2 gap-1 h-full">
-                {/* Lista de Chats */}
                 {(isChatListVisible || isMdOrLarger) && (
                     <div className="h-full flex flex-col">
                         <div
