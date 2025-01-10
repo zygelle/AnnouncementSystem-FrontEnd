@@ -11,7 +11,6 @@ import {
     pathPerfil, pathVisualizarAnuncio, pathVizualizarAnunciante, pathEditarAnuncio
 } from "./Paths.tsx";
 import {Login} from "../pages/login/Login.tsx";
-import {Home} from "../pages/home/Home.tsx";
 import {CriarAnuncio} from "../pages/anuncio/CriarAnuncio.tsx";
 import Navbar from "../components/Navbar.tsx";
 import Communication from "../pages/communication/Communication.tsx";
@@ -45,7 +44,7 @@ const router = createBrowserRouter([
             children:[
                 {
                     path: pathHome,
-                    element: <Home/>
+                    element: <Anuncios />
                 },
                 {
                     path: pathCreateAds,
