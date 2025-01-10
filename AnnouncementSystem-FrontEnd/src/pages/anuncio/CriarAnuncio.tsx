@@ -148,7 +148,7 @@ export function CriarAnuncio(){
 
     return (
         <main>
-            <div className="flex flex-colitems-center justify-center">
+            <div className="flex flex-col items-center justify-center">
                 <div className="w-full flex flex-col p-2 rounded-lg shadow-2x">
                     <div className="flex flex-col items-center mb-6">
                         <PhotoUpload
