@@ -20,6 +20,7 @@ import Anuncios from "../pages/anuncio/Anuncios.tsx";
 import VisualizarAnuncio from "../pages/anuncio/VisualizarAnuncio.tsx";
 import { EditarAnuncio } from "../pages/anuncio/EditarAnuncio.tsx";
 import Assessment from "../pages/assessment/Assessment.tsx";
+import ErrorPage from "../pages/error/ErrorPage.tsx";
 
 const ProtectedRoute = () => {
     return isAuthenticated() ? <Outlet /> : <Navigate to={pathLogin} />;
@@ -36,9 +37,11 @@ const router = createBrowserRouter([
     {
         path: pathLogin,
         element: <Login/>,
+        errorElement: <ErrorPage />
     },
     {
         element: <ProtectedRoute/>,
+        errorElement: <Layout />,
         children: [{
             element: <Layout/>,
             children:[
@@ -81,6 +84,10 @@ const router = createBrowserRouter([
                 {
                     path: pathAssessment,
                     element: <Assessment/>
+                },
+                {
+                    path: "*",
+                    element: <ErrorPage />,
                 }
             ]
         }]
