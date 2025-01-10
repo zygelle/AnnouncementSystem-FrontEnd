@@ -149,16 +149,16 @@ export function CriarAnuncio(){
     return (
         <main>
             <div className="flex flex-colitems-center justify-center">
-                <div className="w-full flex flex-col p-8 rounded-lg shadow-2x">
+                <div className="w-full flex flex-col p-2 rounded-lg shadow-2x">
                     <div className="flex flex-col items-center mb-6">
                         <PhotoUpload
                             Images={setImages}
                             isImages={setIsImages}
                         />
                     </div>
-                    <div className="gap-2.5 mt-5 max-w-full">
+                    <div className="gap-2.5 mt-2 max-w-full">
                         <form onSubmit={handleSubmit(criar)} className="grid grid-cols-2 gap-6">
-                            <div className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-4 col-span-2 md:col-span-1">
                                 <div>
                                     <label className="mb-2">Título</label>
                                     <input
@@ -187,11 +187,12 @@ export function CriarAnuncio(){
                                         }}
                                         className="input"
                                         placeholder="Selecione a cidade"
+                                        menuPosition="fixed"
                                     />
                                     {errors.city && <span className='text-red-600'>{errors.city.message}</span>}
                                 </div>
                             </div>
-                            <div className="flex flex-col gap-4">
+                            <div className="flex flex-col gap-4 col-span-2 md:col-span-1">
                                 <div>
                                     <label className="mb-2">Categorias</label>
                                     <Select
