@@ -4,10 +4,13 @@ import { CreateAssessment, createAssessmentSchema } from "../../schema/Assessmen
 import ReactStars from "react-stars";
 import api from "../../services/api.tsx";
 import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { pathPerfil, pathCommunication } from "../../routers/Paths.tsx";
 
 function Assessment() {
     const location = useLocation();
     const idChat = location.state.idChat;
+    const navigate = useNavigate();
 
     const { register, handleSubmit, setValue, formState: { errors } } = useForm<CreateAssessment>({
         resolver: zodResolver(createAssessmentSchema),
@@ -23,10 +26,12 @@ function Assessment() {
         try {
             const response = await api.post("/assessment", data);
             alert("Avaliação enviada com sucesso!");
+            navigate(pathPerfil);
             console.log("Resposta do backend:", response.data);
         } catch (error: any) {
             console.error("Erro ao enviar avaliação:", error.response?.data || error.message);
             alert("Erro ao enviar avaliação.");
+            navigate(pathCommunication);
         }
     };
 
