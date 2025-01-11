@@ -5,7 +5,7 @@ import {
     pathCreateAds,
     pathFilterAd,
     pathHome, pathLogin,
-    pathMeusAnuncios,
+    pathMyAnnouncement,
     pathPerfil
 } from "../routers/Paths.tsx";
 import {logout} from "../services/token.tsx";
@@ -44,7 +44,7 @@ function Navbar() {
         { label: 'Anúncios', path: pathFilterAd },
         { label: 'Comunicação', path: pathCommunication },
         { label: 'Perfil', path: pathPerfil },
-        { label: 'Meus anúncios', path: pathMeusAnuncios },
+        { label: 'Meus anúncios', path: pathMyAnnouncement },
         { label: 'Sair', path: pathLogin }
     ];
 

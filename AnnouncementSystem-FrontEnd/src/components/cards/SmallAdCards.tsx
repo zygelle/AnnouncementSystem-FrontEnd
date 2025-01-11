@@ -2,11 +2,10 @@ import {Ad} from "../../schema/AdSchema.tsx";
 import {useNavigate} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import {setPathVisualizarAnuncio} from "../../routers/Paths.tsx";
-import {getDownloadURL, listAll, ref} from "firebase/storage";
-import {storage} from "../../services/firebaseConfig.tsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faTag} from "@fortawesome/free-solid-svg-icons";
 import {formatDateSimple} from "../../utils/formatDateSimple.tsx";
+import {fetchFirstImage} from "../../services/firebase/fetchFirstImage.tsx";
 
 interface OptionSmallAdCardProps {
     ad: Ad;
@@ -14,30 +13,21 @@ interface OptionSmallAdCardProps {
 
 const SmallAdCard: React.FC<OptionSmallAdCardProps> = ({ ad }) => {
 
-    const [imageSrc, setImageSrc] = useState('/images/img-padrao.PNG');
+    const [image, setImage] = useState('/images/img-padrao.PNG');
     const navigate = useNavigate();
 
     useEffect(() => {
-        fetchImages(ad.imageArchive)
-    }, []);
-
-    const fetchImages = (id: string | null | undefined) => {
-        if (!ad.imageArchive) {
-            return;
-        }
-        const imageListRef = ref(storage, `${id}/`);
-        listAll(imageListRef).then((response) => {
-            if (response.items.length > 0) {
-                getDownloadURL(response.items[0]).then((url) => {
-                    setImageSrc(url);
-                });
-            } else {
-                console.log("Nenhuma imagem encontrada.");
+        const getImage = async () => {
+            const url = await fetchFirstImage(ad.imageArchive);
+            if (url) {
+                setImage(url);
             }
-        }).catch(error => {
-            console.error("Erro ao buscar as imagens:", error);
+        };
+
+        getImage().catch((error) => {
+            console.error("Erro ao buscar imagem do anúncio: " + error)
         });
-    };
+    }, [ad.imageArchive]);
 
     function handleNavigate(){
         navigate(setPathVisualizarAnuncio(ad.id))
@@ -54,7 +44,7 @@ const SmallAdCard: React.FC<OptionSmallAdCardProps> = ({ ad }) => {
             <div className="justify-items-center content-center">
                 <div className="flex justify-center items-center overflow-hidden h-40">
                     <img
-                        src={imageSrc}
+                        src={image}
                         alt="Imagem do Anúncio"
                         className="w-screen"
                     />

@@ -1,8 +1,7 @@
 import {Chat} from "../../schema/ChatSchema.tsx";
 import React, {useEffect, useState} from "react";
-import {getDownloadURL, listAll, ref} from "firebase/storage";
-import {storage} from "../../services/firebaseConfig.tsx";
 import {formatDateChat} from "../../utils/formatDateChat.tsx";
+import {fetchFirstImage} from "../../services/firebase/fetchFirstImage.tsx";
 
 interface ChatCardProps {
     chat: Chat;
@@ -14,26 +13,17 @@ const ChatCards: React.FC<ChatCardProps> = ({chat, setSelectChat})=> {
     const [imageSrc, setImageSrc] = useState('/images/img-padrao.PNG');
 
     useEffect(() => {
-        fetchImages(chat.announcement.imageArchive)
-    }, []);
-
-    const fetchImages = (id: string | null | undefined) => {
-        if (!chat.announcement.imageArchive) {
-            return;
-        }
-        const imageListRef = ref(storage, `${id}/`);
-        listAll(imageListRef).then((response) => {
-            if (response.items.length > 0) {
-                getDownloadURL(response.items[0]).then((url) => {
-                    setImageSrc(url);
-                });
-            } else {
-                console.log("Nenhuma imagem encontrada.");
+        const getImage = async () => {
+            const url = await fetchFirstImage(chat.announcement.imageArchive);
+            if (url) {
+                setImageSrc(url);
             }
-        }).catch(error => {
-            console.error("Erro ao buscar as imagens:", error);
+        };
+
+        getImage().catch((error) => {
+            console.error("Erro ao buscar imagem do anúncio: " + error)
         });
-    };
+    }, [chat.announcement.imageArchive]);
 
     return (
         <div className={`flex items-center gap-4 m-1 p-1 hover:border-solid hover:border-2 hover:border-blue-300 hover:cursor-pointer ${

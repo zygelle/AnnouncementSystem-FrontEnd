@@ -1,8 +1,9 @@
 import { Client, IMessage } from '@stomp/stompjs';
+import {receiveMessage} from "../schema/ReceiveMessageSchema.tsx";
 
 let stompClient: Client | null = null;
 
-export const connectWebSocket = (token: string | null, onMessageReceived: (message: any) => void): void => {
+export const connectWebSocket = (token: string | null, onMessageReceived: (message: receiveMessage) => void): void => {
     if (token){
         stompClient = new Client({
             brokerURL: `ws://localhost:8080/ws/chat?token=${token}`, // URL do endpoint WebSocket
@@ -13,16 +14,11 @@ export const connectWebSocket = (token: string | null, onMessageReceived: (messa
                     }
                 });
             },
-            onDisconnect: () => {
-                console.log('Desconectado do WebSocket');
-            },
-            // debug: (str: string) => console.log(str),
+            onDisconnect: () => {},
         });
 
         stompClient.activate();
 
-    }else{
-        // console.log("Token Null")
     }
 };
 
@@ -39,7 +35,9 @@ export const sendMessage = (message: object): void => {
 
 export const disconnectWebSocket = (): void => {
     if (stompClient) {
-        stompClient.deactivate();
+        stompClient.deactivate().catch((error) => {
+            console.error("Erro ao desativar: " + error)
+        });
         stompClient = null;
     }
 };

@@ -1,17 +1,17 @@
 import {useNavigate, useParams} from "react-router-dom";
-import {useEffect, useState} from "react";
+import {useCallback, useEffect, useState} from "react";
 import {Ad, AdSchema, FilterRequest} from "../../schema/AdSchema.tsx";
-import api from "../../services/api.tsx";
+import api from "../../services/api/api.tsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faStarHalfStroke, faTag, faEdit, faTrash, faHeart, faHeartCrack} from "@fortawesome/free-solid-svg-icons";
 import {getDownloadURL, listAll, ref} from "firebase/storage";
-import {storage} from "../../services/firebaseConfig.tsx";
-import {pathCommunication, pathFilterAd, setPathVizualizarAnunciante} from "../../routers/Paths.tsx";
+import {storage} from "../../services/firebase/firebaseConfig.tsx";
+import {pathCommunication, pathFilterAd, setPathViewAdvertiser} from "../../routers/Paths.tsx";
 import {getEmail} from "../../services/token.tsx";
 import {chatSchema} from "../../schema/ChatSchema.tsx";
 import {formatDate} from "../../utils/formatDate.tsx";
 import {formatScore} from "../../utils/formatScore.tsx";
-import {fetchImgPerfil} from "../../utils/fetchImgPerfil.tsx";
+import {fetchImgPerfil} from "../../services/firebase/fetchImgPerfil.tsx";
 
 function VisualizarAnuncio() {
 
@@ -28,7 +28,6 @@ function VisualizarAnuncio() {
     const userEmail = getEmail();
 
     function handleCreateChat() {
-
         const createChat = async () => {
             if (!ad) return;
 
@@ -45,7 +44,7 @@ function VisualizarAnuncio() {
             }
         };
 
-        createChat();
+        createChat().catch();
     }
 
     const handlePrevious = () => {
@@ -58,14 +57,16 @@ function VisualizarAnuncio() {
             setCurrentIndex(currentIndex + 1);
         }
     };
+
     function handleAuthor(){
         if(ad && ad.author && ad.author){
-            navigate(setPathVizualizarAnunciante(ad.author.name), {
+            navigate(setPathViewAdvertiser(ad.author.name), {
                 state: { advertiserEmail: ad.author.email }
             });
         }
         else console.log("Erro ao acessar o página do anunciante.")
     }
+
     function handleEdit() {
         if (ad && ad.author.email === userEmail) {
             navigate(`/anuncio/editar/${ad.id}`);
@@ -73,6 +74,7 @@ function VisualizarAnuncio() {
             console.log("Você não pode editar este anúncio.");
         }
     }
+
     async function handleDelete() {
         if (window.confirm("Tem certeza que deseja excluir este anúncio?")) {
             try {
@@ -89,6 +91,7 @@ function VisualizarAnuncio() {
             }
         }
     }
+
     function handleCategoria(id: string) {
         const filterRequest: FilterRequest = {
             title: "",
@@ -99,8 +102,6 @@ function VisualizarAnuncio() {
             maxPrice: null,
             userType: null,
         };
-
-        console.log(filterRequest)
 
         navigate(pathFilterAd, {
             state: filterRequest,
@@ -132,34 +133,6 @@ function VisualizarAnuncio() {
             });
     };
 
-    async function fetchAd() {
-        try {
-            const response = await api.get(`/announcement/${id}`);
-
-            if (response.status !== 200) {
-                throw new Error('Falha ao buscar o anúncio');
-            }
-            const adData = response.data;
-            if (!adData) {
-                throw new Error('Dados do anúncio não encontrados');
-            }
-            const parsedResult = AdSchema.safeParse(adData);
-            if (!parsedResult.success) {
-                console.error(parsedResult.error.errors);
-                throw new Error('Dados inválidos recebidos');
-            }
-            setAd(parsedResult.data);
-            fetchImgPerfil(parsedResult.data.author.icon, setImgPerfil)
-            fetchImages(parsedResult.data.imageArchive)
-        } catch (error: unknown) {
-            if (error instanceof Error) {
-                setError(error.message);
-            } else {
-                setError('Erro desconhecido');
-            }
-        }
-    }
-
     const toggleFavorite = async () => {
         try {
             if (isFavorite) {
@@ -175,8 +148,41 @@ function VisualizarAnuncio() {
         }
     };
 
+    const fetchAd = useCallback(async () => {
+        try {
+            const response = await api.get(`/announcement/${id}`);
+
+            if (response.status !== 200) {
+                throw new Error('Falha ao buscar o anúncio');
+            }
+            const adData = response.data;
+            if (!adData) {
+                throw new Error('Dados do anúncio não encontrados');
+            }
+            const parsedResult = AdSchema.safeParse(adData);
+
+            // Verificando se a validação foi bem-sucedida antes de acessar parsedResult.data
+            if (!parsedResult.success || !parsedResult.data) {
+                console.error(parsedResult.error.errors);
+                throw new Error('Dados inválidos recebidos');
+            }
+
+            // Agora, parsedResult.data é garantidamente válido
+            setAd(parsedResult.data);
+            fetchImgPerfil(parsedResult.data.author.icon, setImgPerfil);
+            fetchImages(parsedResult.data.imageArchive);
+        } catch (error: unknown) {
+            if (error instanceof Error) {
+                setError(error.message);
+            } else {
+                setError('Erro desconhecido');
+            }
+        }
+    }, [id]);
+
+
     useEffect(() => {
-        fetchAd();
+        fetchAd().catch();
 
         async function checkFavorite() {
             try {
@@ -186,8 +192,8 @@ function VisualizarAnuncio() {
                 console.error("Erro ao verificar se o anúncio é favorito:", error);
             }
         }
-        checkFavorite();
-    }, [id]);
+        checkFavorite().catch();
+    }, [id, fetchAd]);
 
     if (error) return <p className="text-red-500">Erro: {error}</p>;
     if (!ad) return <p>Carregando...</p>;

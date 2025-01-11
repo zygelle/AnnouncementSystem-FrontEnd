@@ -1,25 +1,42 @@
 import {getEmail} from "../../services/token.tsx";
 import {useLocation} from "react-router-dom";
-import api from "../../services/api.tsx";
 import {userSchema, User} from "../../schema/UserSchema.tsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
-import {faStarHalfStroke} from "@fortawesome/free-solid-svg-icons";
+import {faArrowRight, faStarHalfStroke} from "@fortawesome/free-solid-svg-icons";
 import {Ad, PaginatedAdsSchema} from "../../schema/AdSchema.tsx";
 import SmallAdCard from "../../components/cards/SmallAdCards.tsx";
-import {useCallback, useEffect, useRef, useState} from 'react';
-import {AssessmentSchema, PaginatedAssessmentsSchema} from "../../schema/AssessmentSchema.tsx";
+import {useCallback, useEffect, useState} from 'react';
+import {Assessment, PaginatedAssessmentsSchema} from "../../schema/AssessmentSchema.tsx";
 import SmallAssessmentCard from "../../components/cards/SmallAssessmentCard.tsx";
 import {formatScore} from "../../utils/formatScore.tsx";
-import {fetchImgPerfil} from "../../utils/fetchImgPerfil.tsx";
+import {fetchImgPerfil} from "../../services/firebase/fetchImgPerfil.tsx";
+import api from "../../services/api/api.tsx";
 
 function Perfil() {
     const location = useLocation();
     const email = location.state?.advertiserEmail || getEmail();
-    const [user, setUser] = useState<User | undefined>();
+    const [user, setUser] = useState<User | null>(null);
     const [imgPerfil, setImgPerfil] = useState<string>('/images/img-padrao.PNG');
 
-    const fetchUser = async () => {
+    const [ads, setAds] = useState<Ad[]>([]);
+    const [pageAd, setPageAd] = useState<number>(0);
+    const [totalPagesAd, setTotalPagesAd] = useState<number>(0);
+
+    const [favorites, setFavorites] = useState<Ad[]>([])
+    const [pageFav, setPageFav] = useState<number>(0)
+    const [totalPagesFav, setTotalPagesFav] = useState<number>(0)
+
+    const [reviews, setReviews] = useState<Assessment[]>([])
+    const [pageReviews, setPageReviews] = useState<number>(0)
+    const [totalPagesReviews, setTotalPagesReviews] = useState<number>(0)
+
+    const [assessments, setAssessments] = useState<Assessment[]>([])
+    const [pageAssessments, setPageAssessments] = useState<number>(0)
+    const [totalPagesAssessments, setTotalPagesAssessments] = useState<number>(0)
+
+    const fetchUser = useCallback(async () => {
         try {
+            setUser(null)
             const response = await api.get(`/user/${email}`);
             const validate = userSchema.safeParse(response.data);
             if (validate.success) {
@@ -31,161 +48,63 @@ function Perfil() {
         } catch (error) {
             console.error("Erro ao buscar usuário: " + error);
         }
-    };
+    }, [email]);
 
-    const [ads, setAds] = useState<Ad[]>([]);
-    const [pageAd, setPageAd] = useState<number>(0);
-    const [totalPagesAd, setTotalPagesAd] = useState<number>(0);
-
-    const adsContainerRefAd = useRef<HTMLDivElement | null>(null);
-    const observerRefAd = useRef<IntersectionObserver | null>(null);
-
-    const loadMoreAds = useCallback(() => {
-        if (pageAd + 1 < totalPagesAd) {
-            setPageAd((prevPage) => prevPage + 1);
-        }
-    }, [pageAd, totalPagesAd]);
-
-    useEffect(() => {
-        const observerCallback: IntersectionObserverCallback = (entries) => {
-            if (entries[0].isIntersecting) {
-                loadMoreAds();
-            }
-        };
-
-        if (adsContainerRefAd.current) {
-            observerRefAd.current = new IntersectionObserver(observerCallback, {
-                root: adsContainerRefAd.current,
-                rootMargin: "0px",
-                threshold: 1.0,
-            });
-
-            const sentinel = document.getElementById("ads-sentinel");
-            if (sentinel) observerRefAd.current.observe(sentinel);
-        }
-
-        return () => observerRefAd.current?.disconnect();
-    }, [loadMoreAds]);
-
-    const fetchMyAds = async (email: string) => {
+    const fetchAds = useCallback(async () => {
+        if(pageAd === 0) setAds([])
         try {
-            if(pageAd == 0 || pageAd > totalPagesAd){
-                setAds([])
-                setPageAd(0)
-                setTotalPagesAd(0)
-            }
             const response = await api.get(`/announcement/user/${email}?page=${pageAd}&size=3`);
             const parsed = PaginatedAdsSchema.safeParse(response.data);
             if (parsed.success) {
                 setAds((prevAds) => [...prevAds, ...parsed.data.content]);
                 setTotalPagesAd(parsed.data.totalPages);
             } else {
-                console.error("Erro de validação", parsed.error);
+                console.error("Erro ao validar anúncios:", parsed.error);
             }
         } catch (error) {
-            console.error("Erro ao buscar os anúncios do usuário: " + error);
+            console.error("Erro ao buscar anúncios:", error);
         }
-    };
+    }, [email, pageAd]);
 
-    const [favorites, setFavorites] = useState<Ad[]>([])
-    const [pageFav, setPageFav] = useState<number>(0)
-    const [totalPagesFav, setTotalPagesFav] = useState<number>(0)
-
-    const adsContainerRefFav = useRef<HTMLDivElement | null>(null);
-    const observerRefFav = useRef<IntersectionObserver | null>(null);
-
-    const loadMoreFav = useCallback(() => {
-        if (pageFav + 1 < totalPagesFav) {
-            setPageFav((prevPage) => prevPage + 1);
-        }
-    }, [pageFav, totalPagesFav]);
-
-    useEffect(() => {
-        const observerCallback: IntersectionObserverCallback = (entries) => {
-            if (entries[0].isIntersecting) {
-                loadMoreFav();
-            }
-        };
-
-        if (adsContainerRefFav.current) {
-            observerRefFav.current = new IntersectionObserver(observerCallback, {
-                root: adsContainerRefFav.current,
-                rootMargin: "0px",
-                threshold: 1.0,
-            });
-
-            const sentinel = document.getElementById("fav-sentinel");
-            if (sentinel) observerRefFav.current.observe(sentinel);
-        }
-
-        return () => observerRefFav.current?.disconnect();
-    }, [loadMoreFav]);
-
-    const fetchMyFavorites = async () => {
+    const fetchAssessments = useCallback(async () => {
+        if(pageAssessments === 0) setAssessments([])
         try {
-            if(pageFav == 0 || pageFav > totalPagesFav){
-                setFavorites([])
-                setPageFav(0)
-                setTotalPagesFav(0)
+            const response = await api.get(`/assessment/${email}/?page=${pageAssessments}&size=3`);
+            const parsed = PaginatedAssessmentsSchema.safeParse(response.data);
+            if (parsed.success) {
+                setAssessments((prevAss) => [...prevAss, ...parsed.data.content]);
+                setTotalPagesAssessments(parsed.data.totalPages);
+            } else {
+                console.error("Erro ao validar avaliações:", parsed.error);
             }
+        } catch (error) {
+            console.error("Erro ao buscar avaliações:", error);
+        }
+    }, [email, pageAssessments]);
+
+    const fetchFavorites = useCallback(async () => {
+        if(pageFav === 0) setFavorites([])
+        try {
             const response = await api.get(`/favorite?page=${pageFav}&size=3`);
             const parsed = PaginatedAdsSchema.safeParse(response.data);
             if (parsed.success) {
-                setFavorites((prevAds) => [...prevAds, ...parsed.data.content]);
+                setFavorites((prevFav) => [...prevFav, ...parsed.data.content]);
                 setTotalPagesFav(parsed.data.totalPages);
             } else {
-                console.error("Erro de validação", parsed.error);
+                console.error("Erro ao validar favoritos:", parsed.error);
             }
         } catch (error) {
-            console.error("Erro ao buscar os anúncios do usuário: " + error);
+            console.error("Erro ao buscar favoritos:", error);
         }
-    };
+    }, [pageFav]);
 
-    const [myReviews, setMyReviews] = useState<AssessmentSchema[]>([])
-    const [pageReviews, setPageReviews] = useState<number>(0)
-    const [totalPagesReviews, setTotalPagesReviews] = useState<number>(0)
-
-    const adsContainerRefReviews = useRef<HTMLDivElement | null>(null);
-    const observerRefReviews = useRef<IntersectionObserver | null>(null);
-
-    const loadMoreReviews = useCallback(() => {
-        if (pageReviews + 1 < totalPagesReviews) {
-            setPageReviews((prevPage) => prevPage + 1);
-        }
-    }, [pageReviews, totalPagesReviews]);
-
-    useEffect(() => {
-        const observerCallback: IntersectionObserverCallback = (entries) => {
-            if (entries[0].isIntersecting) {
-                loadMoreReviews();
-            }
-        };
-
-        if (adsContainerRefReviews.current) {
-            observerRefReviews.current = new IntersectionObserver(observerCallback, {
-                root: adsContainerRefReviews.current,
-                rootMargin: "0px",
-                threshold: 1.0,
-            });
-
-            const sentinel = document.getElementById("rev-sentinel");
-            if (sentinel) observerRefReviews.current.observe(sentinel);
-        }
-
-        return () => observerRefReviews.current?.disconnect();
-    }, [loadMoreReviews]);
-
-    const fetchMyReviews = async () => {
+    const fetchReviews = useCallback(async () => {
+        if(pageReviews === 0) setReviews([])
         try {
-            if(pageReviews == 0 || pageReviews > totalPagesReviews){
-                setMyReviews([])
-                setPageReviews(0)
-                setTotalPagesReviews(0)
-            }
             const response = await api.get(`/assessment/reviews?page=${pageReviews}&size=3`);
             const parsed = PaginatedAssessmentsSchema.safeParse(response.data);
             if (parsed.success) {
-                setMyReviews((prevAds) => [...prevAds, ...parsed.data.content]);
+                setReviews((prevAds) => [...prevAds, ...parsed.data.content]);
                 setTotalPagesReviews(parsed.data.totalPages);
             } else {
                 console.error("Erro de validação", parsed.error);
@@ -193,81 +112,77 @@ function Perfil() {
         } catch (error) {
             console.error("Erro ao buscar os anúncios do usuário: " + error);
         }
-    };
+    },[pageReviews]);
 
-    const [assessments, setAssessments] = useState<AssessmentSchema[]>([])
-    const [pageAssessments, setPageAssessments] = useState<number>(0)
-    const [totalPagesAssessments, setTotalPagesAssessments] = useState<number>(0)
+    useEffect(() => {
+        fetchUser().catch((error) => {
+            console.error("Error ao buscar usuário: " + error)
+        })
+    }, [email, fetchUser]);
 
-    const adsContainerRefAss = useRef<HTMLDivElement | null>(null);
-    const observerRefAss = useRef<IntersectionObserver | null>(null);
+    useEffect(() => {
+        if(pageAd === 0){
+            setAds([])
+            fetchAds().catch((error) => {
+                console.error("Error ao buscar anúncios: " + error)
+            })
+        }else
+            fetchAds().catch((error) => {
+                console.error("Error ao buscar anúncios: " + error)
+            })
+    }, [pageAd, fetchAds]);
 
-    const loadMoreAss = useCallback(() => {
-        if (pageAssessments + 1 < totalPagesAssessments) {
-            setPageAssessments((prevPage) => prevPage + 1);
+    useEffect(() => {
+        if(email === getEmail())
+            fetchFavorites().catch((error) => {
+                console.error("Error ao buscar favoritos: " + error)
+            })
+    }, [email, pageFav, fetchFavorites]);
+
+    useEffect(() => {
+        if(email === getEmail())
+            fetchReviews().catch((error) => {
+                console.error("Error ao buscar avaliações que o usuário fez: " + error)
+            })
+    }, [email, pageReviews, fetchReviews]);
+
+    useEffect(() => {
+        fetchAssessments().catch((error) => {
+            console.error("Error ao buscar avaliações: " + error)
+        })
+    }, [pageAssessments, fetchAssessments]);
+
+    const loadMoreAds = () => setPageAd((prevPage) => {
+        if(prevPage + 1 > totalPagesAd) {
+            setAds([])
+            return 0;
         }
-    }, [pageAssessments, totalPagesAssessments]);
+        else return prevPage + 1
+    });
 
-    useEffect(() => {
-        const observerCallback: IntersectionObserverCallback = (entries) => {
-            if (entries[0].isIntersecting) {
-                loadMoreAss();
-            }
-        };
-
-        if (adsContainerRefAss.current) {
-            observerRefAss.current = new IntersectionObserver(observerCallback, {
-                root: adsContainerRefAss.current,
-                rootMargin: "0px",
-                threshold: 1.0,
-            });
-
-            const sentinel = document.getElementById("ass-sentinel");
-            if (sentinel) observerRefAss.current.observe(sentinel);
+    const loadMoreFavorites = () => setPageFav((prevPage) => {
+        if(prevPage + 1 > totalPagesFav) {
+            setFavorites([])
+            return 0;
         }
+        else return prevPage + 1
+    });
 
-        return () => observerRefAss.current?.disconnect();
-    }, [loadMoreAss]);
-
-    const fetchMyAssessment = async () => {
-        try {
-            if(pageAssessments == 0 || pageAssessments > totalPagesAssessments){
-                setAssessments([])
-                setPageAssessments(0)
-                setTotalPagesAssessments(0)
-            }
-            const response = await api.get(`/assessment/assessments/${email}?page=${pageAssessments}&size=3`);
-            const parsed = PaginatedAssessmentsSchema.safeParse(response.data);
-            if (parsed.success) {
-                setAssessments((prevAds) => [...prevAds, ...parsed.data.content]);
-                setTotalPagesAssessments(parsed.data.totalPages);
-            } else {
-                console.error("Erro de validação", parsed.error);
-            }
-        } catch (error) {
-            console.error("Erro ao buscar os anúncios do usuário: " + error);
+    const loadMoreReviews = () => setPageReviews((prevPage) => {
+        if(prevPage + 1 > totalPagesReviews) {
+            setReviews([])
+            return 0;
         }
-    };
+        else return prevPage + 1
+    });
 
-    useEffect(() => {
-        fetchUser()
-    }, [email]);
-
-    useEffect(() => {
-        fetchMyAds(email);
-    }, [pageAd]);
-
-    useEffect(() => {
-        fetchMyFavorites()
-    }, [pageFav]);
-
-    useEffect(() => {
-        fetchMyReviews()
-    }, [pageReviews]);
-
-    useEffect(() => {
-        fetchMyAssessment()
-    }, [pageAssessments]);
+    const loadMoreAssessments = () => setPageAssessments((prevPage) => {
+        if(prevPage + 1 > totalPagesAssessments) {
+            setAssessments([])
+            return 0;
+        }
+        else return prevPage + 1
+    });
 
     return (
         <main>
@@ -294,15 +209,19 @@ function Perfil() {
                         <div className="flex flex-col gap-1">
                             <div className="text-lg font-semibold">Anúncios</div>
                             <div className="flex gap-2 overflow-y-auto pb-2"
-                                 ref={adsContainerRefAd}
-
                             >
                                 {ads.length > 0 ? (
                                     <>
                                         {ads.map((ad) => (
                                             <SmallAdCard ad={ad} key={ad.id}/>
                                         ))}
-                                        <div id="ads-sentinel" className="h-2 w-full"></div>
+                                        {pageAd + 1 < totalPagesAd && (
+                                            <div className="flex h-full items-center mx-3 py-2">
+                                                <div onClick={loadMoreAds} >
+                                                    <FontAwesomeIcon className="bg-blue-950 p-2 rounded-full text-white" icon={faArrowRight} size="2xl" />
+                                                </div>
+                                            </div>
+                                        )}
                                     </>
                                 ) : (
                                     <div className="text-center w-full italic text-gray-700">Nenhum Anúncio</div>
@@ -313,14 +232,20 @@ function Perfil() {
                             <div className="flex flex-col gap-1">
                                 <div className="text-lg font-semibold">Meus Favoritos</div>
                                 <div className="flex gap-2 overflow-y-auto pb-2"
-                                     ref={adsContainerRefFav}
                                 >
                                     {favorites.length > 0 ? (
                                         <>
-                                            {favorites.map((ad) => (
-                                                <SmallAdCard ad={ad} key={ad.id}/>
+                                            {favorites.map((favorite) => (
+                                                <SmallAdCard ad={favorite} key={favorite.id}/>
                                             ))}
-                                            <div id="fav-sentinel" className="h-2 w-full"></div>
+                                            {pageFav + 1 < totalPagesFav && (
+                                                <div className="flex h-full items-center mx-3 py-2">
+                                                    <div onClick={loadMoreFavorites} >
+                                                        <FontAwesomeIcon className="bg-blue-950 p-2 rounded-full text-white"
+                                                                     icon={faArrowRight} size="2xl"/>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </>
                                     ) : (
                                         <div className="text-center w-full italic text-gray-700">Lista de Favorito
@@ -332,14 +257,20 @@ function Perfil() {
                         <div className="flex flex-col gap-1">
                             <div className="text-lg font-semibold">Avaliações Recebidas</div>
                             <div className="flex gap-2 overflow-y-auto pb-2"
-                                 ref={adsContainerRefAss}
                             >
                                 {assessments.length > 0 ? (
                                     <>
                                         {assessments.map((assessment) => (
                                             <SmallAssessmentCard assessment={assessment} key={assessment.id}/>
                                         ))}
-                                        <div id="ass-sentinel" className="h-2 w-full"></div>
+                                        {pageAssessments + 1 < totalPagesAssessments && (
+                                            <div className="flex h-full items-center mx-3 py-2">
+                                                <div onClick={loadMoreAssessments}>
+                                                    <FontAwesomeIcon className="bg-blue-950 p-2 rounded-full text-white"
+                                                                     icon={faArrowRight} size="2xl"/>
+                                                </div>
+                                            </div>
+                                        )}
                                     </>
                                 ) : (
                                     <div className="text-center w-full italic text-gray-700">Nenhuma Avaliação</div>
@@ -350,14 +281,21 @@ function Perfil() {
                             <div className="flex flex-col gap-1">
                                 <div className="text-lg font-semibold">Minhas Avaliações</div>
                                 <div className="flex gap-2 overflow-y-auto pb-2"
-                                     ref={adsContainerRefReviews}
                                 >
-                                    {myReviews.length > 0 ? (
+                                    {reviews.length > 0 ? (
                                         <>
-                                            {myReviews.map((review) => (
+                                            {reviews.map((review) => (
                                                 <SmallAssessmentCard assessment={review} key={review.id}/>
                                             ))}
-                                            <div id="rev-sentinel" className="h-2 w-full"></div>
+                                            {pageReviews + 1 < totalPagesReviews && (
+                                                <div className="flex h-full items-center mx-3 py-2">
+                                                    <div onClick={loadMoreReviews}>
+                                                        <FontAwesomeIcon
+                                                            className="bg-blue-950 p-2 rounded-full text-white"
+                                                            icon={faArrowRight} size="2xl"/>
+                                                    </div>
+                                                </div>
+                                            )}
                                         </>
                                     ) : (
                                         <div className="text-center w-full italic text-gray-700">Nenhuma Avaliação
@@ -369,7 +307,7 @@ function Perfil() {
                     </div>
                 </div>
             ) : (
-                <div>Nenhum usuário</div>
+                <div className="w-full h-full flex text-center items-center">Carregando...</div>
             )}
         </main>
     );
