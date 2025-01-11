@@ -2,12 +2,15 @@ import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
 import ReactStars from "react-stars";
 import { useLocation } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
+import { pathPerfil, pathCommunication } from "../../routers/Paths.tsx";
 import api from "../../services/api/api.tsx";
 import {CreateAssessment, createAssessmentSchema} from "../../schema/CreateAssessmentSchema.tsx";
 
 function Assessment() {
     const location = useLocation();
     const idChat = location.state.idChat;
+    const navigate = useNavigate();
 
     const { register, handleSubmit, setValue, formState: { errors } } = useForm<CreateAssessment>({
         resolver: zodResolver(createAssessmentSchema),
@@ -23,10 +26,12 @@ function Assessment() {
         try {
             const response = await api.post("/assessment", data);
             alert("Avaliação enviada com sucesso!");
+            navigate(pathPerfil);
             console.log("Resposta do backend:", response.data);
         } catch (error: any) {
             console.error("Erro ao enviar avaliação:", error.response?.data || error.message);
             alert("Erro ao enviar avaliação.");
+            navigate(pathCommunication);
         }
     };
 
