@@ -1,8 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Input } from '../../components/forms/Input';
-import { useState } from "react";
+import React, { useState } from "react";
 
-import api from "../../services/api";
+import api from "../../services/api/api.tsx";
 import {pathHome} from "../../routers/Paths.tsx";
 
 export function Login() {
@@ -28,7 +28,7 @@ export function Login() {
 
             navigate(pathHome);
         } catch (error) {
-            setErrorMessage('Falha no login, tente novamente');
+            setErrorMessage('Falha no login, tente novamente: ' + error);
         }
     }
 

@@ -1,11 +1,11 @@
 import { useForm } from "react-hook-form";
 import { zodResolver } from "@hookform/resolvers/zod";
-import { CreateAssessment, createAssessmentSchema } from "../../schema/AssessmentSchema";
 import ReactStars from "react-stars";
-import api from "../../services/api.tsx";
 import { useLocation } from "react-router-dom";
 import { useNavigate } from "react-router-dom";
 import { pathPerfil, pathCommunication } from "../../routers/Paths.tsx";
+import api from "../../services/api/api.tsx";
+import {CreateAssessment, createAssessmentSchema} from "../../schema/CreateAssessmentSchema.tsx";
 
 function Assessment() {
     const location = useLocation();
@@ -53,7 +53,7 @@ function Assessment() {
                     className="block p-2 w-full text-gray-900 rounded-lg border border-gray-300 focus:outline-slate-300"
                 />
                 {errors.description && <span className='text-red-600'>{errors.description.message}</span>}
-                
+
                 <div className="flex flex-col items-center">
                     <label className="mt-6">Nota</label>
                     <ReactStars

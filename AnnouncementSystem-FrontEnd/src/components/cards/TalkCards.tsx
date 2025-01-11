@@ -1,14 +1,16 @@
-import { useState } from "react";
-import {Chat, chatSchema, receiveMessageSchema, reciveMessage, sendMessageSchema} from "../../schema/ChatSchema.tsx";
+import React, {useCallback, useState} from "react";
+import {Chat, chatSchema} from "../../schema/ChatSchema.tsx";
 import { getEmail, getToken } from "../../services/token.tsx";
 import { useEffect, useRef } from "react";
 import { connectWebSocket, disconnectWebSocket, sendMessage } from "../../services/websocket.tsx";
-import api from "../../services/api.tsx";
+import api from "../../services/api/api.tsx";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import {faArrowRight, faEllipsisVertical} from "@fortawesome/free-solid-svg-icons";
-import {pathAssessment, setPathVisualizarAnuncio, setPathVizualizarAnunciante} from "../../routers/Paths.tsx";
+import {pathAssessment, setPathVisualizarAnuncio, setPathViewAdvertiser} from "../../routers/Paths.tsx";
 import { useNavigate } from "react-router-dom";
 import {formatDateChat} from "../../utils/formatDateChat.tsx";
+import {receiveMessage, receiveMessageSchema} from "../../schema/ReceiveMessageSchema.tsx";
+import {sendMessageSchema} from "../../schema/SendMessageSchema.tsx";
 
 interface TalkCardProps {
     chat: Chat;
@@ -21,7 +23,7 @@ interface TalkCardProps {
 }
 
 const TalkCards: React.FC<TalkCardProps> = ({ chat, setChat, removeChatById, addChatToStart, setChatListVisible, isChatListVisible, isMdOrLarger }) => {
-    const [messages, setMessages] = useState<reciveMessage[]>([]);
+    const [messages, setMessages] = useState<receiveMessage[]>([]);
     const [currentMessage, setCurrentMessage] = useState("");
     const [isConnected, setIsConnected] = useState<boolean>(false);
     const [menuVisible, setMenuVisible] = useState(false);
@@ -30,7 +32,7 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat, setChat, removeChatById, add
     const email = getEmail();
     const navigate = useNavigate();
 
-    const fetchMessages = async () => {
+    const fetchMessages = useCallback(async () => {
         try {
             const response = await api.get(`/chat/message/${chat.id}`);
             const oldMessages = response.data.map((message: unknown) => {
@@ -40,7 +42,7 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat, setChat, removeChatById, add
         } catch (error) {
             console.error("Erro ao buscar mensagens antigas:", error);
         }
-    };
+    }, [chat.id]);
 
     useEffect(() => {
         const handleMessage = (message: unknown) => {
@@ -52,7 +54,7 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat, setChat, removeChatById, add
             }
         };
 
-        fetchMessages();
+        fetchMessages().catch();
         connectWebSocket(token, handleMessage);
         setIsConnected(true);
 
@@ -60,7 +62,7 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat, setChat, removeChatById, add
             disconnectWebSocket();
             setIsConnected(false);
         };
-    }, [token, chat.id]);
+    }, [fetchMessages, token, chat.id]);
 
     const handleSendMessage = () => {
         if (currentMessage.trim() === "") return;
@@ -80,18 +82,18 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat, setChat, removeChatById, add
         }
     };
 
+    useEffect(() => {
+        if (messageEndRef.current) {
+            messageEndRef.current.scrollIntoView({ behavior: "smooth" });
+        }
+    }, [messages]);
+
     const handleKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
         if (e.key === "Enter") {
             e.preventDefault();
             handleSendMessage();
         }
     };
-
-    useEffect(() => {
-        if (messageEndRef.current) {
-            messageEndRef.current.scrollIntoView({ behavior: "smooth" });
-        }
-    }, [messages]);
 
     const handleNavigateAnnouncement = () => {
         navigate(setPathVisualizarAnuncio(chat.announcement.id));
@@ -105,7 +107,7 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat, setChat, removeChatById, add
 
     const handleAuthor = () => {
         if (chat) {
-            navigate(setPathVizualizarAnunciante(chat.participant.name), {
+            navigate(setPathViewAdvertiser(chat.participant.name), {
                 state: { advertiserEmail: chat.participant.email },
             });
         } else {
@@ -135,7 +137,7 @@ const TalkCards: React.FC<TalkCardProps> = ({ chat, setChat, removeChatById, add
             }
         };
 
-        closeChat();
+        closeChat().catch();
     };
 
     return (

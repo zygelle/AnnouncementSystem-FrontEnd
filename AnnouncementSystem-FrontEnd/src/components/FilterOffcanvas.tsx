@@ -1,11 +1,12 @@
 import React, {useEffect, useState} from "react";
-import {Category, CategorySchema, City, CitySchema, FilterRequest, FilterRequestSchema} from "../schema/AdSchema.tsx";
+import {Category, City, FilterRequest, FilterRequestSchema} from "../schema/AdSchema.tsx";
 import { zodResolver } from "@hookform/resolvers/zod";
 import {useForm} from "react-hook-form";
-import api from "../services/api.tsx";
 import Select from "react-select";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faXmark } from '@fortawesome/free-solid-svg-icons';
+import {loadCategories} from "../utils/loadCategories.tsx";
+import {loadCities} from "../utils/loadCities.tsx";
 
 interface FilterOffcanvasProps {
     onApplyFilters: (filter: FilterRequest) => void;
@@ -41,61 +42,30 @@ const FilterOffcanvas: React.FC<FilterOffcanvasProps> = ({ onApplyFilters, onClo
         }
     }, [isOpen, currentFilters, setValue]);
 
-
     const typeUserOptions = [
         { value: "STUDENT", label: "Aluno(a)" },
         { value: "TEACHER", label: "Professor(a)" },
         { value: "EMPLOYEE", label: "Funcionário(s)" }
     ];
-
     const [cityOptions, setCityOptions] = useState<City[]>([]);
-
-    const fetchCities = async () => {
-        try {
-            const response = await api.get("/city");
-
-            const citiesData: City[] = response.data;
-
-            const cities = citiesData.map((city) => {
-                return CitySchema.parse(city);
-            });
-            setCityOptions(cities);
-        } catch (error) {
-            console.error("Erro ao carregar cidades:", error);
-        }
-    };
-
     const [categoryOptions, setCategoryOptions] = useState<Category[]>([]);
-
 
     const categorySelectOptions = categoryOptions.map(category => ({
         value: category.id,
         label: category.name
     }));
-
-    const fetchCategory = async () => {
-        try {
-            const response = await api.get("/category");
-
-            const categoriesData: Category[] = response.data;
-
-            const categories = categoriesData.map((categories) => {
-                return CategorySchema.parse(categories);
-            });
-            setCategoryOptions(categories);
-        } catch (error) {
-            console.error("Erro ao carregar categorias:", error);
-        }
-    };
-
     const citySelectOptions = cityOptions.map(city => ({
         value: city.id,
         label: city.name
     }));
 
     useEffect(() => {
-        fetchCities()
-        fetchCategory()
+        loadCities(setCityOptions).catch((error) => {
+            console.error("Erro ao buscar cidades: " + error)
+        })
+        loadCategories(setCategoryOptions).catch((error) => {
+            console.error("Erro ao buscar categorias: " + error)
+        })
     }, [isOpen]);
 
     const handleApplyFilters = (data: FilterRequest) => {

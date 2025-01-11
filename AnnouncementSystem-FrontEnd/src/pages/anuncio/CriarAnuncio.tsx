@@ -2,15 +2,17 @@ import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import PhotoUpload from '../../components/PhotoUpload.tsx';
 import Select from "react-select";
-import {Category, CategorySchema, City, CitySchema } from "../../schema/AdSchema.tsx";
-import api from '../../services/api.tsx';
+import {Category, City} from "../../schema/AdSchema.tsx";
+import api from '../../services/api/api.tsx';
 import { zodResolver } from "@hookform/resolvers/zod";
 import { v4 } from 'uuid';
 import { pathHome, setPathVisualizarAnuncio } from "../../routers/Paths.tsx";
-import { AdSchema, createAd, createAdSchema } from "../../schema/AdSchema.tsx";
+import { AdSchema } from "../../schema/AdSchema.tsx";
 import { useForm } from "react-hook-form";
-import { storage } from '../../services/firebaseConfig.tsx';
-import { ref, uploadBytesResumable } from "firebase/storage";
+import {loadCities} from "../../utils/loadCities.tsx";
+import {loadCategories} from "../../utils/loadCategories.tsx";
+import {handleUpload} from "../../services/firebase/handleUpload.tsx";
+import {createAd, createAdSchema} from "../../schema/CreateAdSchema.tsx";
 
 export function CriarAnuncio(){
     const [images, setImages] = useState<File[]>([]);
@@ -27,13 +29,6 @@ export function CriarAnuncio(){
             value: city.id,
             label: city.name
         }));
-
-    useEffect(() => {
-            fetchCities()
-            fetchCategory()
-            setNomeArquivo(v4().toString())
-        }, []);
-
     const { register, handleSubmit, formState: { errors }, setValue } = useForm<createAd>({
         resolver: zodResolver(createAdSchema),
         defaultValues: {
@@ -46,71 +41,16 @@ export function CriarAnuncio(){
         },
     });
 
-    const fetchCategory = async () => {
-        try {
-            const response = await api.get("/category");
 
-            const categoriesData: Category[] = response.data;
-
-            const categories = categoriesData.map((categories) => {
-                return CategorySchema.parse(categories);
-            });
-            setCategoryOptions(categories);
-        } catch (error) {
-            console.error("Erro ao carregar categorias:", error);
-        }
-    };
-
-    const fetchCities = async () => {
-        try {
-            const response = await api.get("/city");
-
-            const citiesData: City[] = response.data;
-
-            const cities = citiesData.map((city) => {
-                return CitySchema.parse(city);
-            });
-            setCityOptions(cities);
-        } catch (error) {
-            console.error("Erro ao carregar cidades:", error);
-        }
-    };
-
-    const handleUpload = async (images: File[]): Promise<string> => {
-        const uploadPromises = images.map((image) => {
-            const uniqueName = `${nomeArquivo}/${image.name}_${v4()}`;
-            const storageRef = ref(storage, uniqueName);
-    
-            return new Promise<void>((resolve, reject) => {
-                const uploadTask = uploadBytesResumable(storageRef, image);
-    
-                uploadTask.on(
-                    "state_changed",
-                    (snapshot) => {
-                        const progress = (snapshot.bytesTransferred / snapshot.totalBytes) * 100;
-                        console.log(`Upload de ${image.name}: ${progress.toFixed(2)}% concluído.`);
-                    },
-                    (error) => {
-                        console.error(`Erro ao fazer upload de ${image.name}:`, error);
-                        reject(error);
-                    },
-                    () => {
-                        console.log(`Upload de ${image.name} concluído.`);
-                        resolve();
-                    }
-                );
-            });
-        });
-
-        try {
-            await Promise.all(uploadPromises);
-            console.log("Todos os uploads foram concluídos com sucesso.");
-            return nomeArquivo;
-        } catch (error) {
-            console.error("Erro durante o upload de uma ou mais imagens:", error);
-            throw new Error("Erro durante o upload. Processo interrompido.");
-        }
-    };
+    useEffect(() => {
+        loadCities(setCityOptions).catch((error) => {
+            console.error("Erro ao buscar cidades: " + error)
+        })
+        loadCategories(setCategoryOptions).catch((error) => {
+            console.error("Erro ao buscar categorias: " + error)
+        })
+        setNomeArquivo(v4().toString())
+    }, []);
 
     async function saveDatabase(e:createAd) {
         const result = createAdSchema.safeParse(e);
@@ -130,19 +70,21 @@ export function CriarAnuncio(){
             
         } catch (error) {
             alert("Erro ao criar anúncio");
+            console.error("Erro ao criar anúncio: " + error)
         }
     }
 
     async function criar(e: createAd) {
         try {
             if (isImages && images.length>0) {
-                const nome = await handleUpload(images);
-                e.imageArchive = nome;
+                e.imageArchive = await handleUpload(images, nomeArquivo);
             }
 
-            saveDatabase(e);
+            saveDatabase(e).catch((error) => {
+                console.error("Erro ao salvar anúncio: " + error)
+            });
         } catch (error) {
-            console.error("Erro ao criar anúncio:", error);
+            console.error("Erro ao criar anúncio: ", error);
         }
     }
 
