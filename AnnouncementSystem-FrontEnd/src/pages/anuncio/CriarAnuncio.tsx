@@ -166,6 +166,7 @@ export function CriarAnuncio(){
                             </div>
                             <div className="col-span-2 flex justify-center gap-4">
                                 <button
+                                    onClick={() => {navigate(pathHome)}}
                                     type="reset"
                                     className="h-9 hover:bg-slate-200 rounded border-slate-200 border-2 text-lg px-4">
                                     Cancelar
