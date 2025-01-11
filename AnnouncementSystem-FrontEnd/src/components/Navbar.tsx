@@ -3,7 +3,6 @@ import React from "react";
 import {
     pathCommunication,
     pathCreateAds,
-    pathFilterAd,
     pathHome, pathLogin,
     pathMyAnnouncement,
     pathPerfil
@@ -41,8 +40,7 @@ function Navbar() {
 
     const navigationItems = [
         { label: 'Criar anúncio', path: pathCreateAds },
-        { label: 'Anúncios', path: pathFilterAd },
-        { label: 'Comunicação', path: pathCommunication },
+        { label: 'Chat', path: pathCommunication },
         { label: 'Perfil', path: pathPerfil },
         { label: 'Meus anúncios', path: pathMyAnnouncement },
         { label: 'Sair', path: pathLogin }
