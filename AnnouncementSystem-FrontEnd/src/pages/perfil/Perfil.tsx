@@ -207,7 +207,7 @@ function Perfil() {
                     </div>
                     <div className="flex flex-col gap-2 max-w-full min-w-full">
                         <div className="flex flex-col gap-1">
-                            <div className="text-lg font-semibold">Anúncios</div>
+                            <div className="text-lg font-semibold">Meus Anúncios</div>
                             <div className="flex gap-2 overflow-y-auto pb-2"
                             >
                                 {ads.length > 0 ? (
