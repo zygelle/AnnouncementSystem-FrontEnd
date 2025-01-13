@@ -4,7 +4,7 @@ module.exports = {
         [
             '@babel/preset-react',
             {
-                runtime: 'automatic', // Adicione isso aqui
+                runtime: 'automatic',
             },
         ],
         '@babel/preset-typescript',
