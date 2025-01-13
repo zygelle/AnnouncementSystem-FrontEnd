@@ -13,11 +13,13 @@ import {loadCities} from "../../utils/loadCities.tsx";
 import {loadCategories} from "../../utils/loadCategories.tsx";
 import {handleUpload} from "../../services/firebase/handleUpload.tsx";
 import {createAd, createAdSchema} from "../../schema/CreateAdSchema.tsx";
+import {getDownloadURL, listAll, ref} from "firebase/storage";
+import {storage} from "../../services/firebase/firebaseConfig.tsx";
 
 export function EditarAnuncio() {
     const { id } = useParams();
     const [images, setImages] = useState<File[]>([]);
-    const [isImages, setIsImages] = useState<boolean>(false);
+    const [_, setIsImages] = useState<boolean>(false);
     const [nomeArquivo, setNomeArquivo] = useState<string>('');
     const [cityOptions, setCityOptions] = useState<City[]>([]);
     const [categoryOptions, setCategoryOptions] = useState<Category[]>([]);
@@ -34,6 +36,52 @@ export function EditarAnuncio() {
         resolver: zodResolver(createAdSchema),
     });
 
+    const fetchImages = (nomeArquivo: string | null | undefined) => {
+        if(!nomeArquivo){
+            return
+        }
+        const imageListRef = ref(storage, `${nomeArquivo}/`);
+        listAll(imageListRef)
+            .then((response) => {
+                if (response.items.length > 0) {
+                    setIsImages(true);
+                    Promise.all(
+                        response.items.map((item) => getDownloadURL(item))
+                    )
+                        .then(async (urls) => {
+                            const files = await loadFilesFromURLs(urls);
+                            setImages(files);
+                        })
+                        .catch((error) => {
+                            console.error("Erro ao buscar as URLs:", error);
+                        });
+                } else {
+                    console.log("Nenhuma imagem encontrada.");
+                }
+            })
+            .catch((error) => {
+                console.error("Erro ao buscar as imagens:", error);
+            });
+    };
+
+    const createFileFromURL = async (url: string, fileName: string) => {
+        const response = await fetch(url);
+        const blob = await response.blob();
+        return new File([blob], fileName, { type: blob.type });
+    };
+
+    const loadFilesFromURLs = async (urls: string[]) => {
+        try {
+            const files = await Promise.all(
+                urls.map((url, index) => createFileFromURL(url, `image-${index + 1}.jpg`))
+            );
+            return files;
+        } catch (error) {
+            console.error("Erro ao converter URLs para Files:", error);
+            return [];
+        }
+    };
+
     const fetchAdDetails = useCallback(async () => {
         if (id) {
             try {
@@ -45,6 +93,9 @@ export function EditarAnuncio() {
                 if (adData.price) setValue("price", adData.price);
                 setValue("city", adData.city.id);
                 setValue("categories", adData.categories.map((cat) => cat.id));
+                setValue("imageArchive", adData.imageArchive);
+                fetchImages(adData.imageArchive);
+
             } catch (error) {
                 console.error("Erro ao carregar os dados do anúncio:", error);
             }
@@ -68,9 +119,7 @@ export function EditarAnuncio() {
 
     const editar = async (e: createAd) => {
         try {
-            if (isImages && images.length > 0) {
-                e.imageArchive = await handleUpload(images, nomeArquivo);
-            }
+            e.imageArchive = await handleUpload(images, nomeArquivo);
 
             const result = createAdSchema.safeParse(e);
             if (!result.success) {
