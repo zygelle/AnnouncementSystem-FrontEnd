@@ -1,4 +1,4 @@
-import React, { useState, useRef } from 'react';
+import { useState, useRef } from 'react';
 
 interface photoUploadProps {
     Images: (images: File[]) => void;
@@ -49,7 +49,7 @@ const PhotoUpload: React.FC<photoUploadProps> = ({ Images, isImages }) => {
     return (
         <div className="flex flex-col justify-center items-center">
             <h2 className="text-center text-lg mb-6">Upload de Foto</h2>
-            <input data-testid="photo-upload-input" type="file" onChange={handleFileChange} multiple ref={fileInputRef} className="hidden" />
+            <input type="file" onChange={handleFileChange} multiple ref={fileInputRef} className="hidden" />
             <button
                 className="order p-2 rounded-md cursor-pointer text-gray-600 bg-white shadow-md w-80 text-center"
                 onClick={() => fileInputRef.current?.click()}

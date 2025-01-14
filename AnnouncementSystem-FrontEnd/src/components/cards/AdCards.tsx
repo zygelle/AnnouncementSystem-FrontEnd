@@ -2,10 +2,10 @@ import {Ad} from "../../schema/AdSchema.tsx";
 import {useNavigate} from "react-router-dom";
 import React, {useEffect, useState} from "react";
 import {setPathVisualizarAnuncio} from "../../routers/Paths.tsx";
+import {getDownloadURL, listAll, ref} from "firebase/storage";
+import {storage} from "../../services/firebaseConfig.tsx";
 import {FontAwesomeIcon} from "@fortawesome/react-fontawesome";
 import {faTag} from "@fortawesome/free-solid-svg-icons";
-import {formatDateSimple} from "../../utils/formatDateSimple.tsx";
-import {fetchFirstImage} from "../../services/firebase/fetchFirstImage.tsx";
 
 interface OptionAdCardsProps {
     ad: Ad;
@@ -13,21 +13,38 @@ interface OptionAdCardsProps {
 
 const AdCardsOptional: React.FC<OptionAdCardsProps> = ({ ad }) => {
 
+    const formatDate = (date: string) => {
+        const options: Intl.DateTimeFormatOptions = {
+            day: '2-digit',
+            month: 'long',
+            year: 'numeric'
+        };
+        return new Date(date).toLocaleDateString('pt-BR', options);
+    };
     const [imageSrc, setImageSrc] = useState('/images/img-padrao.PNG');
     const navigate = useNavigate();
 
     useEffect(() => {
-        const getImage = async () => {
-            const url = await fetchFirstImage(ad.imageArchive);
-            if (url) {
-                setImageSrc(url);
-            }
-        };
+        fetchImages(ad.imageArchive)
+    }, []);
 
-        getImage().catch((error) => {
-            console.error("Erro ao buscar imagem do anúncio: " + error)
+    const fetchImages = (id: string | null | undefined) => {
+        if (!ad.imageArchive) {
+            return;
+        }
+        const imageListRef = ref(storage, `${id}/`);
+        listAll(imageListRef).then((response) => {
+            if (response.items.length > 0) {
+                getDownloadURL(response.items[0]).then((url) => {
+                    setImageSrc(url);
+                });
+            } else {
+                console.log("Nenhuma imagem encontrada.");
+            }
+        }).catch(error => {
+            console.error("Erro ao buscar as imagens:", error);
         });
-    }, [ad.imageArchive]);
+    };
 
     function handleNavigate(){
         navigate(setPathVisualizarAnuncio(ad.id))
@@ -39,7 +56,7 @@ const AdCardsOptional: React.FC<OptionAdCardsProps> = ({ ad }) => {
         " onClick={handleNavigate}>
             <div className="grid grid-cols-2 col-span-2 md:order-2">
                 <div>{ad.city.name}</div>
-                <div className="text-end text-sm">{formatDateSimple(ad.date)}</div>
+                <div className="text-end text-sm">{formatDate(ad.date)}</div>
             </div>
             <div className="justify-items-center content-center md:row-span-5 md:order-1 md:pe-1">
                 <div className="flex justify-center items-center overflow-hidden h-40 md:h-48 md:rounded-3xl lg:40">

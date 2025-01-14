@@ -1,8 +1,8 @@
 import { Link, useNavigate } from "react-router-dom";
 import { Input } from '../../components/forms/Input';
-import React, { useState } from "react";
+import { useState } from "react";
 
-import api from "../../services/api/api.tsx";
+import api from "../../services/api";
 import {pathHome} from "../../routers/Paths.tsx";
 
 export function Login() {
@@ -28,7 +28,7 @@ export function Login() {
 
             navigate(pathHome);
         } catch (error) {
-            setErrorMessage('Falha no login, tente novamente: ' + error);
+            setErrorMessage('Falha no login, tente novamente');
         }
     }
 
@@ -42,18 +42,16 @@ export function Login() {
             </Link>
 
             <form onSubmit={login} className="w-full max-w-xl flex flex-col p-8 rounded-lg bg-white shadow-2xl">
-                <label id="email-label" className="mb-2">Email</label>
+                <label className="mb-2">Email</label>
                 <Input
-                aria-labelledby="email-label"
                 placeholder="Insira seu email"
                 type="email"
                 value={email}
                 onChange={ (e) => setEmail(e.target.value) }
                 />
 
-                <label id="senha" className="mb-2">Senha</label>
+                <label className="mb-2">Senha</label>
                 <Input
-                aria-labelledby="senha"
                 placeholder="Insira sua senha"
                 type="password"
                 value={password}
