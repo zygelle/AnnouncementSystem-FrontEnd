@@ -19,7 +19,7 @@ export function CriarAnuncio(){
     const [isImages, setIsImages] = useState<boolean>(false);
     const [nomeArquivo, setNomeArquivo] = useState<string>('');
     const navigate = useNavigate();
-    const [isEnable, setEnable] = useState<boolean>(true)
+    const [isEnable, setEnable] = useState<boolean>(false);
     const [cityOptions, setCityOptions] = useState<City[]>([]);
     const [categoryOptions, setCategoryOptions] = useState<Category[]>([]);
     const categorySelectOptions = categoryOptions.map(category => ({
@@ -77,7 +77,7 @@ export function CriarAnuncio(){
 
     async function criar(e: createAd) {
         try {
-            setEnable(false)
+            setEnable(true);
             if (isImages && images.length>0) {
                 e.imageArchive = await handleUpload(images, nomeArquivo);
             }
