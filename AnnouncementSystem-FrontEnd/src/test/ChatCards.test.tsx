@@ -1,5 +1,5 @@
 import { render, screen, fireEvent } from '@testing-library/react';
-import ChatCards from '../components/cards/ChatCards'; // Ajuste o caminho para o seu componente
+import ChatCards from '../components/cards/ChatCards';
 import { Chat } from "../schema/ChatSchema.tsx";
 import '@testing-library/jest-dom';
 
@@ -18,7 +18,7 @@ const mockChat: Chat = {
     participant: { name: 'Participante Teste', email: 'teste@teste.com' },
     chatStatus: 'OPEN',
     isEvaluated: false,
-    dateLastMessage: "2025-01-10T12:00:00Z" // Verifique se o formato está correto
+    dateLastMessage: "2025-01-10T12:00:00Z"
 };
 
 describe('ChatCards Component', () => {
@@ -31,9 +31,7 @@ describe('ChatCards Component', () => {
             />
         );
 
-        // Verifica se o título do anúncio está sendo exibido
         expect(screen.getByText('Anúncio Teste')).toBeInTheDocument();
-        // Verifica se o nome do participante está sendo exibido
         expect(screen.getByText('Participante Teste')).toBeInTheDocument();
     });
 
@@ -45,10 +43,8 @@ describe('ChatCards Component', () => {
             />
         );
 
-        // Aguarde até que o efeito de useEffect seja executado
         const img = await screen.findByAltText('Imagem do Anúncio');
 
-        // Verifica se a imagem do anúncio foi renderizada com o src correto
         expect(img).toHaveAttribute('src', '/images/test-image.jpg');
     });
 
@@ -60,7 +56,7 @@ describe('ChatCards Component', () => {
             />
         );
 
-        const dateText = screen.getByText(/Ontem/);
+        const dateText = screen.getByText(/10 de jan. de 2025, 09:00/);
         expect(dateText).toBeInTheDocument();
     });
 
@@ -77,7 +73,6 @@ describe('ChatCards Component', () => {
         const chatCard = screen.getByText('Anúncio Teste');
         fireEvent.click(chatCard);
 
-        // Verifica se a função setSelectChat foi chamada
         expect(setSelectChatMock).toHaveBeenCalledWith(mockChat);
     });
 
