@@ -102,27 +102,30 @@ export function CriarAnuncio(){
                         <form onSubmit={handleSubmit(criar)} className="grid grid-cols-2 gap-6">
                             <div className="flex flex-col gap-4 col-span-2 md:col-span-1">
                                 <div>
-                                    <label className="mb-2">Título</label>
+                                    <label id="title" className="mb-2">Título</label>
                                     <input
                                         {...register("title")}
+                                        aria-labelledby="title"
                                         className="w-full border border-slate-300 h-9 rounded-md outline-none px-2 mb-4"
                                         placeholder="Título"
                                     />
                                     {errors.title && <span className="text-red-600">{errors.title.message}</span>}
                                 </div>
                                 <div>
-                                    <label className="mb-2">Descrição do Anúncio</label>
+                                    <label id="description" className="mb-2">Descrição do Anúncio</label>
                                     <textarea
                                         {...register("content")}
+                                        aria-labelledby="description"
                                         rows={4}
                                         className="block p-2 w-full text-sm text-gray-900 rounded-lg border border-gray-300 focus:outline-slate-300"
                                     />
                                     {errors.content && <span className='text-red-600'>{errors.content.message}</span>}
                                 </div>
                                 <div>
-                                    <label className="mb-2">Localização</label>
+                                    <label id="location" className="mb-2">Localização</label>
                                     <Select
                                         {...register("city")}
+                                        aria-labelledby="location"
                                         options={citySelectOptions}
                                         onChange={(selectedOption) => {
                                             setValue("city", selectedOption ? selectedOption.value : '');
@@ -136,9 +139,10 @@ export function CriarAnuncio(){
                             </div>
                             <div className="flex flex-col gap-4 col-span-2 md:col-span-1">
                                 <div>
-                                    <label className="mb-2">Categorias</label>
+                                    <label id="categories" className="mb-2">Categorias</label>
                                     <Select
                                         {...register("categories")}
+                                        aria-labelledby="categories"
                                         options={categorySelectOptions}
                                         isMulti
                                         onChange={(selectedOptions) => {
@@ -152,9 +156,10 @@ export function CriarAnuncio(){
                                         <span className='text-red-600'>{errors.categories.message}</span>}
                                 </div>
                                 <div>
-                                    <label className="mb-2">Preço (R$)</label>
+                                    <label id="price" className="mb-2">Preço (R$)</label>
                                     <input
                                         {...register("price", {valueAsNumber: true})}
+                                        aria-labelledby="price"
                                         className='w-full border border-slate-300 h-9 rounded-md outline-none px-2 mb-4'
                                         placeholder="0.0"
                                         step={.01}
