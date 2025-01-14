@@ -42,16 +42,18 @@ export function Login() {
             </Link>
 
             <form onSubmit={login} className="w-full max-w-xl flex flex-col p-8 rounded-lg bg-white shadow-2xl">
-                <label className="mb-2">Email</label>
+                <label id="email-label" className="mb-2">Email</label>
                 <Input
+                aria-labelledby="email-label"
                 placeholder="Insira seu email"
                 type="email"
                 value={email}
                 onChange={ (e) => setEmail(e.target.value) }
                 />
 
-                <label className="mb-2">Senha</label>
+                <label id="senha" className="mb-2">Senha</label>
                 <Input
+                aria-labelledby="senha"
                 placeholder="Insira sua senha"
                 type="password"
                 value={password}
