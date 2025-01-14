@@ -3,9 +3,8 @@ import React from "react";
 import {
     pathCommunication,
     pathCreateAds,
-    pathFilterAd,
     pathHome, pathLogin,
-    pathMeusAnuncios,
+    pathMyAnnouncement,
     pathPerfil
 } from "../routers/Paths.tsx";
 import {logout} from "../services/token.tsx";
@@ -41,10 +40,9 @@ function Navbar() {
 
     const navigationItems = [
         { label: 'Criar anúncio', path: pathCreateAds },
-        { label: 'Anúncios', path: pathFilterAd },
-        { label: 'Comunicação', path: pathCommunication },
+        { label: 'Chat', path: pathCommunication },
+        { label: 'Meus anúncios', path: pathMyAnnouncement },
         { label: 'Perfil', path: pathPerfil },
-        { label: 'Meus anúncios', path: pathMeusAnuncios },
         { label: 'Sair', path: pathLogin }
     ];
 
