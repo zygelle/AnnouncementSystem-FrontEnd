@@ -1,18 +1,18 @@
-import {Ad, FilterRequest, FilterRequestSchema, PaginatedAdsSchema} from "../../schema/AdSchema.tsx";
-import {useEffect, useRef, useState} from "react";
-import api from "../../services/api.tsx";
+import {Ad, FilterRequest} from "../../schema/AdSchema.tsx";
+import React, {useEffect, useRef, useState} from "react";
 import FilterOffcanvas from "../../components/FilterOffcanvas.tsx";
 import Pagination from "../../components/Pagination.tsx";
 import AdCardsOptional from "../../components/cards/AdCards.tsx";
 import { FontAwesomeIcon } from '@fortawesome/react-fontawesome';
 import { faFilter, faBroom } from '@fortawesome/free-solid-svg-icons';
 import {useLocation} from "react-router-dom";
+import {fetchAdsWithFilter} from "../../services/api/adsService.tsx";
 
-interface AnunciosProps {
+interface AnnouncementProps {
     initialFilter?: FilterRequest;
 }
 
-const Anuncios: React.FC<AnunciosProps> = () => {
+const Announcement: React.FC<AnnouncementProps> = () => {
 
     const location = useLocation();
     const initialFilter = location.state as FilterRequest | undefined;
@@ -40,36 +40,27 @@ const Anuncios: React.FC<AnunciosProps> = () => {
         topRef.current?.scrollIntoView({ behavior: 'smooth' });
     };
 
-    const fetchAds = async () => {
-        setLoading(true);
-        try {
-            const validation = FilterRequestSchema.safeParse(filter);
-            if (!validation.success) {
-                console.error("Erro de validação dos dados de requisição", validation.error);
-                return;
-            }
-            const response = await api.post(`announcement/filter?page=${page}&size=10`, validation.data);
-            const parsed = PaginatedAdsSchema.safeParse(response.data);
-            if (parsed.success) {
-                setAds(parsed.data.content);
-                setTotalPages(parsed.data.totalPages);
-            } else {
-                console.error("Erro de validação", parsed.error);
-            }
-        } catch (error) {
-            console.error("Erro ao buscar os anúncios", error);
-        } finally {
-            setLoading(false);
-        }
-    };
-
     const handleFilterChange = (newFilters: FilterRequest) => {
         setIsFilter(true)
         setFilter(newFilters);
     };
 
+    const loadAds = async (filter: FilterRequest, page: number) => {
+        setLoading(true);
+        const result = await fetchAdsWithFilter(filter, page);
+        if (result.success && result.data) {
+            setAds(result.data.ads);
+            setTotalPages(result.data.totalPages);
+        } else {
+            console.error(result.error);
+        }
+        setLoading(false);
+    };
+
     useEffect(() => {
-        fetchAds()
+        loadAds(filter, page).catch((error) => {
+            console.error("Erro ao carregar os anúncios:", error);
+        });
     }, [page, filter]);
 
 
@@ -78,7 +69,6 @@ const Anuncios: React.FC<AnunciosProps> = () => {
             setIsFilter(true);
         }
     }, [initialFilter]);
-
 
     const openOffcanvas = () => setIsOffcanvasOpen(true);
     const closeOffcanvas = () => setIsOffcanvasOpen(false);
@@ -154,4 +144,4 @@ const Anuncios: React.FC<AnunciosProps> = () => {
     );
 }
 
-export default Anuncios;
+export default Announcement;
