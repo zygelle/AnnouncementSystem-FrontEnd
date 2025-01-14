@@ -1,10 +1,10 @@
 import {Ad, PaginatedAdsSchema} from "../../schema/AdSchema.tsx";
-import React, {useCallback, useEffect, useState} from "react";
-import api from "../../services/api/api.tsx";
+import {useEffect, useState} from "react";
+import api from "../../services/api.tsx";
 import AdCardsOptional from "../../components/cards/AdCards.tsx";
 import Pagination from "../../components/Pagination.tsx";
 
-const MyAnnouncement: React.FC = () => {
+const MeusAnuncios: React.FC = () => {
     const [openAds, setOpenAds] = useState<Ad[]>([]);
     const [closedAds, setClosedAds] = useState<Ad[]>([]);
     const [suspendedAds, setSuspendedAds] = useState<Ad[]>([]);
@@ -16,7 +16,7 @@ const MyAnnouncement: React.FC = () => {
     const [currentTab, setCurrentTab] = useState("open");
     const [loading, setLoading] = useState<boolean>(false);
 
-    const fetchAds = useCallback(async (status: string) => {
+    const fetchAds = async (status: string) => {
         setLoading(true);
         try {
             const token = localStorage.getItem('accessToken');
@@ -25,34 +25,36 @@ const MyAnnouncement: React.FC = () => {
                     Authorization: `Bearer ${token}`,
                 },
             });
+            console.log("Dados recebidos da API:", response.data.totalElements);
             const parsed = PaginatedAdsSchema.safeParse(response.data);
-            if (parsed.success) {
-                if (status === "open") {
-                    setOpenAds(parsed.data.content);
-                    setOpenAdsCount(parsed.data.totalElements);
-                }
-                if (status === "closed") {
-                    setClosedAds(parsed.data.content);
-                    setClosedAdsCount(parsed.data.totalElements);
-                }
-                if (status === "suspended") {
-                    setSuspendedAds(parsed.data.content);
-                    setSuspendedAdsCount(parsed.data.totalElements);
-                }
-                setTotalPages(parsed.data.totalPages);
-            } else {
-                console.error("Erro ao validar resposta do servidor:", parsed.error);
+        if (parsed.success) {
+            if (status === "open") {
+                setOpenAds(parsed.data.content);
+                setOpenAdsCount(parsed.data.totalElements);
             }
+            if (status === "closed") {
+                setClosedAds(parsed.data.content);
+                setClosedAdsCount(parsed.data.totalElements);
+            }
+            if (status === "suspended") {
+                setSuspendedAds(parsed.data.content);
+                setSuspendedAdsCount(parsed.data.totalElements);
+            }
+            setTotalPages(parsed.data.totalPages);
+        } else {
+            console.error("Erro ao validar resposta do servidor:", parsed.error);
+        }
         } catch (error) {
             console.error(`Erro ao buscar anúncios ${status}:`, error);
         } finally {
             setLoading(false);
         }
-    }, [page]);
+    };
 
     useEffect(() => {
-        fetchAds(currentTab).catch();
-    }, [fetchAds, currentTab, page]);
+        console.log("Fetching ads with", { currentTab, page });
+        fetchAds(currentTab);
+    }, [currentTab, page]);
 
     return (
         <main>
@@ -147,4 +149,4 @@ const MyAnnouncement: React.FC = () => {
     );
 }
 
-export default MyAnnouncement;
+export default MeusAnuncios;
